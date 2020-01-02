@@ -44,7 +44,7 @@
             selectedElement = target;
         console.log(selectedElement);
         elementInfo(selectedElement);
-        // popupColorPicker.click();
+        popupColorPicker.click();
         document.removeEventListener('click', selectElement);
         document.removeEventListener('mouseover', hoverElements);
         document.removeEventListener('mouseout', resetHover);

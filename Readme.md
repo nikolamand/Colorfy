@@ -1,4 +1,4 @@
-# Colorfy ![Alt](/icon_32.png "Colorfy") 
+# Colorfy ![Colorfy logo](/icon_32.png "Colorfy") 
 ---   
 
 #### Installation instruction:  
