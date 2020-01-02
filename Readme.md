@@ -1,7 +1,7 @@
-#Colorfy ![Alt](/icon_32.png "Colorfy") 
+# Colorfy ![Alt](/icon_32.png "Colorfy") 
 ---   
 
-####Installation instruction:
+#### Installation instruction:  
 
 * Clone the repo.
 * Go to [Chrome extentions](chrome://extensions/)
@@ -10,7 +10,7 @@
 
 ---   
 
-####How to use:
+#### How to use:  
 * Click on the extention icon
 * Select the element you want to change the background color
 * Select a color **Different from the default color**
