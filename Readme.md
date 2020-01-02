@@ -4,7 +4,7 @@
 #### Installation instruction:  
 
 * Clone the repo.
-* Go to [Chrome extentions](chrome://extensions/)
+* Go to chrome://extensions/
 * Enable Developer mode in the top right corner.
 * Click on Load Unpacked button and select the folder where the repo was cloned.
 
