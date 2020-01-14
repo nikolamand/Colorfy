@@ -1,46 +1,81 @@
 
+// Array of JSON objects for the whole chrome.storage
+let storedData = [];
+// Array with DOM elements for the given URL
+let storedColors = [];
 
 /**
- * Get elements from localstorage
- * @return {string[Object]} Array of JSON objects with saved elements or null
+ * Get base URL for the currently opened tab
+ * @return {string} Base URL for the page on the currently opened tab
  */
-const getElements = () => {
-  let elements = null;
-  let elementsArr = [];
-  if (localStorage.getItem("Colorfy-elements")) {
-    elements = JSON.parse(localStorage.getItem("Colorfy-elements"));
-    elementsArr = Object.values(elements);
-  }
-  return elementsArr;
-};
+const getBaseURL = () => {
+  let getUrl = window.location;
+  let baseUrl = getUrl.protocol + "//" + getUrl.host;
+  return baseUrl;
+}
+
+const getData = () => {
+  chrome.storage.local.get(["Colorfy"], function (data) {
+    if (data["Colorfy"]) {
+      storedData = changeFormat(data["Colorfy"])
+      for (let i = 0, len = storedData.length; i < len; i++) {
+
+        if (storedData[i]["url"] == getBaseURL()) {
+          storedColors = storedData[i]["elements"];
+          getSavedChanges(storedColors);
+        }
+      }
+      console.log(storedColors)
+    }
+  });
+}
+getData();
+
+chrome.storage.onChanged.addListener(getData());
+
+const changeFormat = data => {
+  let elements = JSON.parse(data);
+  return Object.values(elements);
+}
 
 /**
- * Save element to localstorage
+ * Save element to chrome.storage
  * @param {Object} el JSON object with information about element that needs to be saved
  */
 const saveElement = el => {
-  let elements = getElements();
-  console.log(elements);
   //Used to check if the elment already exists
   let removeIndex = null;
-  if (elements) {
-    for (let i = 0, len = elements.length; i < len; i++) {
+  if (storedColors.length > 0) {
+    for (let i = 0, len = storedColors.length; i < len; i++) {
       if (
-        elements[i].nodeName == el.nodeName &&
-        elements[i].id == el.id &&
-        elements[i].className == el.className
+        storedColors[i].nodeName == el.nodeName &&
+        storedColors[i].id == el.id &&
+        storedColors[i].className == el.className
       )
         removeIndex = i;
     }
     //Remove element, so that it can be added to the end of array
-    if (removeIndex != null) elements.splice(removeIndex, 1);
+    if (removeIndex != null) storedColors.splice(removeIndex, 1);
+    storedColors.push(el);
   }
   //Initiate element if it is getting saved for the first time
-  else elements = [el];
-  elements.push(el);
-  //Save elements to localstorage
-  elements = JSON.stringify(elements);
-  window.localStorage.setItem("Colorfy-elements", elements);
+  else {
+    storedColors = [el];
+  }
+
+  let changedStoredData = null;
+  for (let i = 0, len = storedData.length; i < len; i++) {
+    if (storedData[i]["url"] == getBaseURL()) {
+      storedData[i]["elements"] = storedColors;
+      changedStoredData = i;
+    }
+  }
+
+  //Add a new element to storedData(chrome.storage) if it hasn't been changed
+  if (changedStoredData === null)
+    storedData.push({ 'url': getBaseURL(), 'elements': storedColors });
+  //Save elements to chrome.storage
+  chrome.storage.local.set({ "Colorfy": JSON.stringify(storedData) });
 };
 
 /**
@@ -82,19 +117,23 @@ const selectElements = e => {
 };
 
 /**
- * Change colors for the elements saved in localstorage
+ * Change background colors for the given elements
+ * @param {array} data 
  */
-const getSavedChanges = () => {
-  //Get array from localstorage
-  elements = getElements();
-  if (elements) {
-    for (let i = 0, len = elements.length; i < len; i++) {
+const getSavedChanges = (data) => {
+  if (data) {
+    for (let i = 0, len = data.length; i < len; i++) {
       //Get DOM elements
-      let seleectedElements = selectElements(elements[i]);
-      let selectedColor = elements[i].color;
+      let seleectedElements = selectElements(data[i]);
+      let selectedColor = data[i].color;
       //Change color for each DOM element
       for (let index = 0; index < seleectedElements.length; index++) {
         const element = seleectedElements[index];
+        element.style.setProperty(
+          "background",
+          "none",
+          "important"
+        );
         element.style.setProperty(
           "background-color",
           selectedColor,
@@ -104,4 +143,14 @@ const getSavedChanges = () => {
     }
   }
 };
-getSavedChanges();
+
+
+const clearColors = () => {
+  chrome.storage.local.clear(function () {
+    var error = chrome.runtime.lastError;
+    if (error) {
+      console.error(error);
+    }
+  });
+}
+

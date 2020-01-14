@@ -1,0 +1,45 @@
+
+		body {
+			background-color: #0e1426;
+			background-image: url("../images/clean-gray-paper.png");
+		}
+
+		.modal-body {
+			display: flex;
+			width: 100vw;
+			height: 100vh;
+			justify-content: center;
+			align-items: center;
+		}
+
+		#clear_all_changes {
+			display: inline-block;
+			padding: 0.5em 3em;
+			border: 0.16em solid #FFFFFF;
+			margin: 0 0.3em 0.3em 0;
+			box-sizing: border-box;
+			text-decoration: none;
+			text-transform: uppercase;
+			font-family: 'Roboto', sans-serif;
+			font-weight: 400;
+			color: #444444;
+			text-align: center;
+			transition: all 0.15s;
+		}
+
+		#clear_all_changes:hover {
+			color: #DDDDDD;
+			border-color: #DDDDDD;
+		}
+
+		#clear_all_changes:active {
+			color: #BBBBBB;
+			border-color: #BBBBBB;
+		}
+
+		@media all and (max-width:30em) {
+			#clear_all_changes {
+				display: block;
+				margin: 0.4em auto;
+			}
+		}

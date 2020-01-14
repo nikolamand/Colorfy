@@ -1,23 +1,29 @@
-(function(global) {
+(function (global) {
+  var saveBackground = null;
+  //Saves background color for the element if there is inline CSS on the element
+  var saveBackgroundColor = null;
+  var selectedElement = null;
+  var selectedColor = null;
   const init = () => {
-    var selectedElement = null;
-    //Saves background color for the element if there is inline CSS on the element
-    var saveBackground = null;
-    var saveBackgroundColor = null;
-    var colorfyColorPicker = null;
-
     addColorPicker();
     addListeners();
   };
-  
-  const changeColor = () => {
-    var selectedColor = colorfyColorPicker.value;
+
+  /**
+   * Changes background color of selected DOM element
+   * @param {DOM} element DOM elment
+   */
+  const changeColor = element => {
     //Remove images from background
-    selectedElement.style.setProperty("background", "none", "important");
-    selectedElement.style.setProperty("background-color", selectedColor, "important"); 
+    element.style.setProperty("background", "none", "important");
+    element.style.setProperty("background-color", selectedColor, "important");
   };
 
-  const addColorPicker = e => {
+  /**
+   * Create color picker and it's event listener that calls changeColor function
+   */
+  const addColorPicker = () => {
+    var colorfyColorPicker = null;
     if (document.getElementById("colorfyColorPicker") != null) {
       return;
     }
@@ -28,74 +34,138 @@
     colorfyColorPicker.value = "#365389";
     colorfyColorPicker.hidden = true;
     document.getElementsByTagName("body")[0].appendChild(colorfyColorPicker);
-
-    //FIX HTML5 color picker .oninput event seems to have a bugg that makes it act the same as .onchange event
-    //so this will need to be addressed in to be able to add a color selected by default (colorfyColorPicker.value)
-    colorfyColorPicker.oninput = changeColor;
+    colorfyColorPicker.addEventListener("input", pickerInput);
   };
 
-  //Change element background when hovered over (mouseover event)
+  /**
+   * Select color from color picker and call changeColor function, 
+   * then call saveElement function to save the selected element
+   */
+  const pickerInput = () => {
+    selectedColor = colorfyColorPicker.value;
+    let target = selectElements(selectedElement);
+    for (let index = 0; index < target.length; index++) {
+      const element = target[index];
+      changeColor(element);
+    }
+    document.getElementsByTagName("body")[0].removeChild(colorfyColorPicker);
+    saveElement(elementInfo(selectedElement));
+    removeListeners();
+  };
+
+  /**
+   * Change element background when hovered over (mouseover event)
+   * @param {DOM} e DOM element that is taken from onmouseover event
+   */
   const hoverElements = e => {
-    e = e || window.event;
-    let target = e.target || e.srcElement;
-    
-    //FIX saveBackground and saveBackgroundColor, take the color from localstorage when it is created.
-    saveBackground = target.style.background;
-    saveBackgroundColor = target.style.backgroundColor;
-    target.style.setProperty("background", "none", "important");
-    target.style.setProperty("background-color", "rgba(0,40,80,0.3)", "important");
-  };
+    let target = selectElements(e);
 
-  //Return  element background
-  const resetHover = e => {
-    e = e || window.event;
-    let target = e.target || e.srcElement;
-    if(saveBackgroundColor)
-      target.style.setProperty("background-color", saveBackgroundColor);
-    else if(saveBackground)
-      target.style.setProperty("background", saveBackground);
-    else{
-      target.style.setProperty("background-color", "");
-      target.style.setProperty("background", "");
+    for (let index = 0; index < target.length; index++) {
+      const element = target[index];
+      //FIX saveBackground and saveBackgroundColor, take the color from localstorage when it is created.
+      saveBackground = element.style.background;
+      saveBackgroundColor = element.style.backgroundColor;
+      element.style.setProperty("background", "none", "important");
+      element.style.setProperty(
+        "background-color",
+        "rgba(0,40,80,0.5)",
+        "important"
+      );
     }
   };
 
-  const removeListeners = () => {
-    document.removeEventListener("click", selectElement);
-    document.removeEventListener("mouseover", hoverElements);
-    document.removeEventListener("mouseout", resetHover);
+  /**
+   * Return element background (mouseout event)
+   * @param {DOM} e DOM element that is taken from mouseout event
+   */
+  const resetHover = e => {
+    let target = selectElements(e);
+
+    for (let index = 0; index < target.length; index++) {
+      const element = target[index];
+      if (saveBackgroundColor)
+        element.style.setProperty("background-color", saveBackgroundColor);
+      else if (saveBackground)
+        element.style.setProperty("background", saveBackground);
+      else {
+        element.style.setProperty("background-color", "");
+        element.style.setProperty("background", "");
+      }
+    }
   };
 
+  /**
+   * Add event listeners
+   */
   const addListeners = () => {
-    document.addEventListener("click", selectElement, false);
+    document.addEventListener("click", changeElement, false);
     document.addEventListener("mouseover", hoverElements, false);
     document.addEventListener("mouseout", resetHover, false);
   };
 
-  const selectElement = e => {
-    e = e || window.event;
-    let target = e.target || e.srcElement;
-    if (target == colorfyColorPicker) return;
-    else selectedElement = target;
-    elementInfo(selectedElement);
-    colorfyColorPicker.click();
-    removeListeners();
-    resetHover(e);
+  /**
+   * Remove event listeners
+   */
+  const removeListeners = () => {
+    document.removeEventListener("click", changeElement);
+    document.removeEventListener("mouseover", hoverElements);
+    document.removeEventListener("mouseout", resetHover);
   };
 
-  //preparation for backend.
-  const elementInfo = element => {
+  /**
+   * Take DOM element and return it's information in JSON form
+   * This is a coppy of the function from backend.js that is used in case when backend.js fails to load
+   * @param {DOM} e DOM element
+   * @return {Object} JSON object with element information
+   */
+  const elementInfo = e => {
+    let element = e.target;
     let elementId = element.id;
+    let color = element.style.backgroundColor;
     let elementClass = element.className;
     let elementNodeName = element.nodeName;
-    let parentElement = element.parentNode;
-    let tree = [element];
-    do {
-      if (parentElement == document) break;
-      tree.push(parentElement);
-      parentElement = parentElement.parentNode;
-      if (!parentElement) break;
-    } while (parentElement.nodeName != "BODY");
+    let el = {
+      nodeName: elementNodeName,
+      id: elementId,
+      className: elementClass,
+      color: color
+    };
+    return el;
+  };
+
+  /**
+   * Select element and click on color picker to activate color picker event listener
+   * @param {object} e DOM object taken from the onClick event listener
+   */
+  const changeElement = e => {
+    colorfyColorPicker.click();
+    if (e.target == colorfyColorPicker) return;
+    else {
+      selectedElement = e;
+    }
+    resetHover(e);
+    removeListeners();
+  };
+
+  /**
+   * Select elements on the page with the information provided and return it
+   * @param {object} e DOM or JSON object with the information about the element
+   * @return {array} Array consisting of DOM elements
+   */
+  const selectElements = e => {
+    let element;
+    if (e.target)
+      element = e.target;
+    else
+      element = e;
+    let elArr = [];
+    if (element.id)
+      elArr.push(document.getElementById(element.id));
+    else if (element.className)
+      elArr = document.getElementsByClassName(element.className);
+    else if (element.nodeName)
+      elArr = document.getElementsByTagName(element.nodeName);
+    return elArr;
   };
 
   init();
