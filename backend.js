@@ -25,7 +25,6 @@ const getData = () => {
           getSavedChanges(storedColors);
         }
       }
-      console.log(storedColors)
     }
   });
 }

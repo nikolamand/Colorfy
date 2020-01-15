@@ -11,7 +11,7 @@
 ---   
 
 #### How to use:  
-* Click on the extention icon
+* Click on the extension icon
 * Select the element you want to change the background color
 * Select a color **Different from the default color**
 

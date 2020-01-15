@@ -1,5 +1,5 @@
 /**
- * Create onClick action for the extention icon
+ * Create onClick action for the extension icon
  */
 chrome.browserAction.onClicked.addListener(function (tab) {
 	chrome.tabs.executeScript(null, { file: "main.js" });
@@ -60,7 +60,7 @@ const clearColors = () => {
  */
 chrome.contextMenus.create({
 	"id": "knkcpioaicifeajdcfjejagihgmlehfn",
-	"title": "Remove all changes",
+	"title": "Remove all changes from website",
 	"contexts": ["page", "browser_action"]
 });
 

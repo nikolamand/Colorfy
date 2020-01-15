@@ -1,6 +1,6 @@
 {
   "name": "Colorfy",
-  "description": "Extention for changing element color",
+  "description": "Extension used to change background color for the element selected on a web page.",
   "version": "0.0.1",
   "manifest_version": 2,
   "icons": {
@@ -30,8 +30,8 @@
     }
   ],
   "permissions": [
-    "contextMenus",
     "activeTab",
+    "contextMenus",
     "storage"
   ],
   
