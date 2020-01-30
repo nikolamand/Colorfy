@@ -1,7 +1,7 @@
 {
   "name": "Colorfy",
   "description": "Extension used to change background color for the element selected on a web page.",
-  "version": "0.0.1",
+  "version": "0.9.1",
   "manifest_version": 2,
   "icons": {
     "16": "icon_16.png",
@@ -9,6 +9,7 @@
     "64": "icon_64.png",
     "128": "icon_128.png"
   },
+  "web_accessible_resources": ["images/*", "colorfy.css"],
   "browser_action": {
     "default_icon": "icon.png"
   },
@@ -26,7 +27,8 @@
       ],
       "js": [
         "backend.js"
-      ]
+      ],
+      "css" : ["colorfy.css"]
     }
   ],
   "permissions": [

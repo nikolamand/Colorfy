@@ -14,6 +14,9 @@ const getBaseURL = () => {
   return baseUrl;
 }
 
+/**
+ * Get the data stored in chrome.storage and call the function that changes element colors (getSavedChanges)
+ */
 const getData = () => {
   chrome.storage.local.get(["Colorfy"], function (data) {
     if (data["Colorfy"]) {
@@ -85,17 +88,72 @@ const saveElement = el => {
 const elementInfo = e => {
   let element = e.target;
   let elementId = element.id;
-  let color = element.style.backgroundColor;
+  let backgroundColor = element.style.backgroundColor;
+  let color = element.style.color;
   let elementClass = element.className;
   let elementNodeName = element.nodeName;
+  let parent = element.parentNode;
+  let parentNode;
+  if(parent.nodeName != "#document")
+    parentNode = {
+      id: parent.id.trim(),
+      className: parent.className.trim(),
+      nodeName: parent.nodeName
+    }
+  else
+    parentNode = {
+      id: "#document",
+      className: "#document",
+      nodeName: "#document"
+    }     
+
   let el = {
     nodeName: elementNodeName,
-    id: elementId,
-    className: elementClass,
-    color: color
+    id: elementId.trim(),
+    className: elementClass.trim(),
+    backgroundColor: backgroundColor,
+    color: color,
+    parentNode: parentNode
   };
+  console.log(el)
   return el;
 };
+
+/**
+ * Get the info about elements parent, used for elements with only tagName, 
+ * so that we dont change all elements with that tag across entire website.
+ * @param {Object} element HTML element
+ */
+const parentInfo = element => {
+  let parent = element.parentNode;
+  let parentNode;
+  if(parent.nodeName != "#document")
+    parentNode = {
+      id: parent.id.trim(),
+      className: parent.className.trim(),
+      nodeName: parent.nodeName
+    }
+  else
+    parentNode = {
+      id: "#document",
+      className: "#document",
+      nodeName: "#document"
+    }     
+  return parentNode;
+
+}
+
+/**
+ * Check if the two objects are identical
+ * @param {Object} first
+ * @param {Object} second 
+ */
+const checkParents = (first, second) => {
+  if (first.id == second.id && first.className == second.className && first.nodeName == second.nodeName)
+    return true;
+  else
+    return false
+}
 
 /**
  * Get DOM elements with provided information/element
@@ -110,8 +168,13 @@ const selectElements = e => {
   if (element.id) elArr.push(document.getElementById(element.id));
   else if (element.className)
     elArr = document.getElementsByClassName(element.className);
-  else if (element.nodeName)
-    elArr = document.getElementsByTagName(element.nodeName);
+  else if (element.nodeName) {
+    let tmp = document.getElementsByTagName(element.nodeName);
+    for (let i = 0, len = tmp.length; i < len; i++) {
+      if (checkParents(element.parentNode, parentInfo(tmp[i])))
+        elArr.push(tmp[i]);
+    }
+  }
   return elArr;
 };
 
@@ -123,21 +186,25 @@ const getSavedChanges = (data) => {
   if (data) {
     for (let i = 0, len = data.length; i < len; i++) {
       //Get DOM elements
-      let seleectedElements = selectElements(data[i]);
-      let selectedColor = data[i].color;
+      let selectedElements = selectElements(data[i]);
+      let selectedBackground = data[i].backgroundColor;
+      let selectedTextColor = data[i].color;
       //Change color for each DOM element
-      for (let index = 0; index < seleectedElements.length; index++) {
-        const element = seleectedElements[index];
+      for (let index = 0; index < selectedElements.length; index++) {
+        const element = selectedElements[index];
         element.style.setProperty(
           "background",
-          "none",
+          selectedBackground,
           "important"
         );
-        element.style.setProperty(
-          "background-color",
-          selectedColor,
-          "important"
-        );
+        element.style.setProperty("color", "none", "important");
+        element.style.setProperty("color", selectedTextColor, "important");
+        //Change text color of all elements nested inside original element
+        let family = element.getElementsByTagName("*");
+        for (let i = 0, len = family.length; i < len; i++) {
+          family[i].style.setProperty("color", "none", "important");
+          family[i].style.setProperty("color", selectedTextColor, "important");
+        }
       }
     }
   }

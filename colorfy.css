@@ -1,0 +1,155 @@
+
+      #colorfy_modal{
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        overflow: auto; 
+        left: 0;
+        top: 0;
+        z-index: 10000980;
+        background-color: rgb(0,0,0); 
+        background-color: rgba(0,0,0,0.4); 
+      }
+
+      #palette_wrapper {
+        top: 15px;
+        left: 15px;
+        position: fixed;
+        width: 50%;
+        left:25%;
+        padding: 10px;
+        background-color: rgb(9, 92, 165);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        border: 2px solid rgb(41, 41, 41);
+        border-radius: 10px;
+        z-index: 10000990;
+        -webkit-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75);
+        box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75);
+      }
+
+      .closeColorfy{
+        cursor: pointer;
+        font-family: Arial;
+        line-height: initial;
+        color: #aaa;
+        width: 2em;
+        margin-left: calc(100% - 40px);
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+      }
+
+      .palette {
+        padding: 10px;
+        margin: 5px;
+        width: 40%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+
+      .palette_info {
+        width: 100%;
+        font-family: Arial;
+        line-height: initial;
+        font-size: 30px;
+        margin: 5px 5px 15px 5px;
+        border-bottom: 2px solid white;
+        color: azure;
+        text-align: center;
+      }
+
+      /* HIDE RADIO */
+      .palette > label > [type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      /* IMAGE STYLES */
+      .palette > label > [type="radio"] + p {
+        cursor: pointer;
+      }
+
+      /* CHECKED STYLES */
+      .palette > label > [type="radio"]:checked + p {
+        outline: 2px solid #f00;
+      }
+
+      .colorfy_color {
+        border: 3px solid gray;
+        width: 30px;
+        height: 30px;
+        margin: 5px;
+        border-radius: 5px;
+      }
+
+      #colorfy_submit {
+        box-shadow: inset 0px 1px 3px 0px #91b8b3;
+        background: linear-gradient(to bottom, #768d87 5%, #6c7c7c 100%);
+        background-color: #768d87;
+        border-radius: 5px;
+        border: 1px solid #566963;
+        display: inline-block;
+        cursor: pointer;
+        color: #ffffff;
+        font-family: Arial;
+        line-height: initial;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 11px 23px;
+        text-decoration: none;
+        text-shadow: 0px -1px 0px #2b665e;
+        height: 40px;
+      }
+      
+      #colorfy_submit:hover {
+        background: linear-gradient(to bottom, #6c7c7c 5%, #768d87 100%);
+        background-color: #6c7c7c;
+      }
+      
+      #colorfy_submit:active {
+        position: relative;
+        top: 1px;
+      }
+
+      .colorfy_default_color_wrap{
+        width: 100%;
+        margin: auto;
+      }
+
+      .colorfy_custom_color {
+        width: 80%;
+        display: flex;
+        font-size: 20px;
+        flex-wrap: wrap;
+        padding: 5px;
+        height: auto;
+        font-weight: bold;
+        justify-content: space-around;
+        align-items: center;
+        color: black;
+        font-family: Arial;
+      }
+      
+      .colorfy_default_color{
+        width: 80%;
+        font-size: 20px;
+        margin: 5px auto;
+        width: fit-content;
+        padding: 5px;
+        height: auto;
+        font-weight: bold;
+        color: black;
+        font-family: Arial;
+      }
+
+
+      #colorfy_submit {
+        order: 5;
+        margin: 10px 40% 30px 40%;
+      }
