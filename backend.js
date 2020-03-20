@@ -88,6 +88,7 @@ const saveElement = el => {
 const elementInfo = e => {
   let element = e.target;
   let elementId = element.id;
+  let background = element.style.background;
   let backgroundColor = element.style.backgroundColor;
   let color = element.style.color;
   let elementClass = element.className;
@@ -111,6 +112,7 @@ const elementInfo = e => {
     nodeName: elementNodeName,
     id: elementId.trim(),
     className: elementClass.trim(),
+    background: background,
     backgroundColor: backgroundColor,
     color: color,
     parentNode: parentNode
@@ -187,11 +189,17 @@ const getSavedChanges = (data) => {
     for (let i = 0, len = data.length; i < len; i++) {
       //Get DOM elements
       let selectedElements = selectElements(data[i]);
-      let selectedBackground = data[i].backgroundColor;
+      let selectedBackground = data[i].background;
+      let selectedBackgroundColor = data[i].backgroundColor;
       let selectedTextColor = data[i].color;
       //Change color for each DOM element
       for (let index = 0; index < selectedElements.length; index++) {
         const element = selectedElements[index];
+        element.style.setProperty(
+          "background",
+          selectedBackgroundColor,
+          "important"
+        );
         element.style.setProperty(
           "background",
           selectedBackground,

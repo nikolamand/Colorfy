@@ -1,0 +1,36 @@
+{
+  "background": {
+    "message": "Pozadina"
+  },
+  "text": {
+    "message": "Tekst"
+  },
+  "defaultColor": {
+    "message": "Početna boja"
+  },
+  "customColor": {
+    "message": "Proizvoljna boja"
+  },
+  "warningElement": {
+    "message": "Ovaj element se ne može menjati!"
+  },
+  "pageReset": {
+    "message": "Vrati stranicu na prvobitno stanje"
+  },
+  "pageResetConfirm": {
+    "message": "Da li ste sigurni da želite da uklonite sve promene na stranici?\nStranica će se automatski osvežiti prilikom uklanjanja"
+  },
+  "optionsResetButton": {
+    "message": "Ukloni SVE promjene"
+  },
+  "optionsResetConfirm": {
+    "message": "Jeste li sigurni da želite ukloniti promjene sa svih saćuvanih web lokacija?\nOvaj proces je destruktivan i promene se ne mogu povratiti!"
+  },
+  "optionsResetSuccess": {
+    "message": "Sve sačuvane promjene su uklonjene!"
+  },
+
+  "description": {
+    "message": "Lako promijenite boje elemenata na web stranici."
+  }
+}

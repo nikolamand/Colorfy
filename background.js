@@ -36,23 +36,26 @@ const getBaseURL = url => {
  */
 const clearColors = () => {
 	let storedData = [];
-	chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-		chrome.storage.local.get(["Colorfy"], function (data) {
-			if (data["Colorfy"]) {
-				storedData = JSON.parse(data["Colorfy"]);
-				let removeIndex = null;
-				for (let i = 0, len = storedData.length; i < len; i++) {
-					if (storedData[i]['url'] == getBaseURL(tabs[0].url)) {
-						removeIndex = i;
+	let clear = confirm(chrome.i18n.getMessage("pageResetConfirm"));
+	if(clear){
+		chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+			chrome.storage.local.get(["Colorfy"], function (data) {
+				if (data["Colorfy"]) {
+					storedData = JSON.parse(data["Colorfy"]);
+					let removeIndex = null;
+					for (let i = 0, len = storedData.length; i < len; i++) {
+						if (storedData[i]['url'] == getBaseURL(tabs[0].url)) {
+							removeIndex = i;
+						}
 					}
+					if (removeIndex != null) storedData.splice(removeIndex, 1);
+					storedData = JSON.stringify(storedData);
+					chrome.storage.local.set({ "Colorfy": storedData });
 				}
-				if (removeIndex != null) storedData.splice(removeIndex, 1);
-				storedData = JSON.stringify(storedData);
-				chrome.storage.local.set({ "Colorfy": storedData });
-			}
+			});
 		});
-	});
-	alert("Reload for changes to apply.");
+		chrome.tabs.reload();
+	}
 }
 
 /**
@@ -60,7 +63,7 @@ const clearColors = () => {
  */
 chrome.contextMenus.create({
 	"id": "knkcpioaicifeajdcfjejagihgmlehfn",
-	"title": "Remove all changes from website",
+	"title": chrome.i18n.getMessage("pageReset"),
 	"contexts": ["page", "browser_action"]
 });
 

@@ -1,0 +1,36 @@
+{
+  "background": {
+    "message": "Background"
+  },
+  "text": {
+    "message": "Text"
+  },
+  "defaultColor": {
+    "message": "Default color"
+  },
+  "customColor": {
+    "message": "Custom color"
+  },
+  "warningElement": {
+    "message": "This element can not be changed!"
+  },
+  "pageReset": {
+    "message": "Remove all changes from website"
+  },
+  "pageResetConfirm": {
+    "message": "Are you sure you want to remove changes from the page?\nPage will be refreshed automatically after confirmation"
+  },
+  "optionsResetButton": {
+    "message": "Clear ALL changes"
+  },
+  "optionsResetConfirm": {
+    "message": "Are you sure you want to remove changes from all of the saved websites?\nThis process is ireversable!"
+  },
+  "optionsResetSuccess": {
+    "message": "All saved changes have been removed!"
+  },
+
+  "description": {
+    "message": "Change colors of elements on a web page easily."
+  }
+}

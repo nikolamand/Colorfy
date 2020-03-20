@@ -11,8 +11,8 @@ loadPicker();
 
   var colorfyColors = [
     //black
-    "#000000",
     "#222930",
+    "#595959",
     "#6c7a89",
 
     //blue
@@ -27,6 +27,12 @@ loadPicker();
     "#E9E9E9",
     "#FFFFFF"
   ];
+
+  var colorfyGradients = [
+    "linear-gradient(90deg, rgba(33,147,176,1) 0%, rgba(109,213,237,1) 100%)",
+    "linear-gradient(90deg, rgba(204,43,94,1) 0%, rgba(117,58,136,1) 100%)",
+    "linear-gradient(90deg, rgba(149,149,149,1) 0%, rgba(44,62,80,1) 100%)"
+  ]
   
   const init = () => {
     //Load CSS
@@ -74,28 +80,57 @@ loadPicker();
   };
 
   /**
-   * Creates palette with color schemes, return to default color, and color picker.
+   * Adds colors from the array to the selected palette
    * @param {Array} colors Array containing base colors used in both background and text
    * @param {String} paletteName String for palette name, it can be "background" and "text"
    */
-  const addColors = (colors, paletteName) => {
-    
+  const addPresetColors = (colors, paletteName) => {
     let label = null;
     let input = null;
+    let presetColors = null;
     let colorBox = null;
     let palette = null;
-    let paletteInfo = null;
 
-    palette = document.createElement("div");
-    palette.className = "palette palette-" + paletteName;
-    paletteWrapper.appendChild(palette);
+    palette = document.getElementsByClassName("palette-" + paletteName)[0];
 
-    paletteInfo = document.createElement("p");
-    paletteInfo.className = "palette_info";
-    paletteInfo.innerHTML =
-      paletteName.charAt(0).toUpperCase() + paletteName.slice(1);
-    palette.appendChild(paletteInfo);
+    presetColors = document.createElement("div");
+    presetColors.className = "colorfy_preset_colors"
     
+    //Colors from array
+    for (let i = 0, len = colors.length; i < len; i++) {
+      label = document.createElement("label");
+      input = document.createElement("input");
+      input.name = "paletteColors-" + paletteName;
+      input.type = "radio";
+      input.value = colors[i];
+      colorBox = document.createElement("p");
+      colorBox.className = "colorfy_color";
+      colorBox.style.background = colors[i];
+
+      presetColors.appendChild(label)
+      palette.appendChild(presetColors);
+      label.appendChild(input);
+      label.appendChild(colorBox);
+    }
+
+  }
+  
+  /**
+   * Adds selction for the "Default color" that returns the color to its original value
+   * @param {String} paletteName String for palette name, it can be "background" and "text"
+   */
+  const addDefaultColor = (paletteName) => {
+    let label = null;
+    let input = null;
+    let individualWrap = null;
+    let colorBox = null;
+    let palette = null;
+
+    palette = document.getElementsByClassName("palette-" + paletteName)[0];
+
+    individualWrap = document.createElement("div");
+    individualWrap.className = "individual_color_wrapper";
+
     //Default color, used to change background back to initial
     label = document.createElement("label");
     label.className = "colorfy_default_color_wrap"
@@ -107,27 +142,30 @@ loadPicker();
     colorBox = document.createElement("p");
     colorBox.className = "colorfy_color colorfy_default_color";
     colorBox.style.backgroundColor = "white";
-    colorBox.innerHTML = "Default color"
+    colorBox.innerHTML = chrome.i18n.getMessage("defaultColor");
 
-    palette.appendChild(label);
+    individualWrap.appendChild(label)
+    palette.appendChild(individualWrap);
     label.appendChild(input);
     label.appendChild(colorBox);
-    
-    //Colors from array
-    for (let i = 0, len = colors.length; i < len; i++) {
-      label = document.createElement("label");
-      input = document.createElement("input");
-      input.name = "paletteColors-" + paletteName;
-      input.type = "radio";
-      input.value = colors[i];
-      colorBox = document.createElement("p");
-      colorBox.className = "colorfy_color";
-      colorBox.style.backgroundColor = colors[i];
 
-      palette.appendChild(label);
-      label.appendChild(input);
-      label.appendChild(colorBox);
-    }
+  }
+
+  /**
+   * Adds custom color picker to the palette
+   * @param {String} paletteName String for palette name, it can be "background" and "text"
+   */
+  const addCustomColor = (paletteName) => {
+    let label = null;
+    let input = null;
+    let individualWrap = null;
+    let colorBox = null;
+    let palette = null;
+
+    palette = document.getElementsByClassName("palette-" + paletteName)[0];
+
+    individualWrap = document.createElement("div");
+    individualWrap.className = "individual_color_wrapper";
 
     //Create custom color (vanilla color picker)
     label = document.createElement("label");
@@ -143,13 +181,22 @@ loadPicker();
     colorBox = document.createElement("p");
     colorBox.className = "colorfy_color colorfy_custom_color";
     colorBox.id = "colorfy_color-" + paletteName;
-    colorBox.innerHTML = "Custom color";
+    colorBox.innerHTML = chrome.i18n.getMessage("customColor");
     colorBox.style.backgroundColor = "#FFF";
     
+    //set the initial custom color to already selected color
+    let currentColor;
+    if(paletteName == "background")
+      currentColor = selectedElement.target.style.background;
+    if(paletteName == "text")
+      currentColor = selectedElement.target.style.color;
+    if(!currentColor)
+      currentColor = "#FFFF";
 
     if(typeof Picker != "undefined"){
       new Picker({
           parent: colorBox,
+          color: currentColor,
           onChange: function(color){
             colorBox.style.background = color.rgbaString;
             input.value = color.rgbaString;
@@ -160,9 +207,48 @@ loadPicker();
     else
       console.log("Undefined Picker");
 
-    palette.appendChild(label);
+    individualWrap.appendChild(label)
+    palette.appendChild(individualWrap);
     label.appendChild(input);
     label.appendChild(colorBox);
+
+  }
+
+  /**
+   * Creates palette with color schemes, return to default color, and color picker.
+   * @param {Array} colors Array containing base colors used in both background and text
+   * @param {String} paletteName String for palette name, it can be "background" and "text"
+   */
+  const addColors = (paletteName) => {
+    
+    let palette = null;
+    let paletteInfo = null;
+
+    palette = document.createElement("div");
+    palette.className = "palette palette-" + paletteName;
+    paletteWrapper.appendChild(palette);
+
+    paletteInfo = document.createElement("p");
+    paletteInfo.className = "palette_info";
+    let getPaletteName;
+    if(paletteName == "background")
+      getPaletteName = chrome.i18n.getMessage("background");
+    if(paletteName == "text")
+      getPaletteName = chrome.i18n.getMessage("text");
+    
+    paletteInfo.innerHTML = getPaletteName;
+    palette.appendChild(paletteInfo);
+    
+    
+    addDefaultColor(paletteName);
+
+    addPresetColors(colorfyColors, paletteName);
+
+    addCustomColor(paletteName);
+
+    if(paletteName == "background")
+      addPresetColors(colorfyGradients, paletteName)
+
   };
 
   /**
@@ -192,13 +278,12 @@ loadPicker();
       const element = target[index];
       changeColor(element);
     }
-
-    //Remove picker and modal
-    document.getElementsByTagName("body")[0].removeChild(paletteWrapper);
-    document.getElementsByTagName("body")[0].removeChild(modalWrapper);
     
     saveElement(elementInfo(selectedElement));
-    removeListeners();
+
+    //Remove picker and modal
+    closeColorfy();
+    
   }
 
   /**
@@ -211,6 +296,9 @@ loadPicker();
     if(modalWrapper){
       document.getElementsByTagName("body")[0].removeChild(modalWrapper);
     }
+    let checkWarning = document.getElementById("colorfy_impossible")
+    if(checkWarning)
+      document.getElementsByTagName("body")[0].removeChild(checkWarning);
     removeListeners();
   }
 
@@ -235,8 +323,8 @@ loadPicker();
    */
   const addColorPicker = () => {
     createPaletteWrapper();
-    addColors(colorfyColors, "background");
-    addColors(colorfyColors, "text");
+    addColors("background");
+    addColors("text");
   };
 
   /**
@@ -308,6 +396,7 @@ loadPicker();
   const elementInfo = e => {
     let element = e.target;
     let elementId = element.id;
+    let background = element.style.background;
     let backgroundColor = element.style.backgroundColor;
     let color = element.style.color;
     let elementClass = element.className;
@@ -331,6 +420,7 @@ loadPicker();
       nodeName: elementNodeName,
       id: elementId.trim(),
       className: elementClass.trim(),
+      background: background,
       backgroundColor: backgroundColor,
       color: color,
       parentNode: parentNode
@@ -343,8 +433,8 @@ loadPicker();
    * @param {object} e DOM object taken from the onClick event listener
    */
   const changeElement = e => {
-    addColorPicker();
     selectedElement = e;
+    addColorPicker();
     resetHover(e);
     removeListeners();
   };
@@ -360,7 +450,22 @@ loadPicker();
       element = e.target;
     else
       element = e;
+
+    let colorfyWarning = document.createElement("p");
+    colorfyWarning.id = "colorfy_impossible";
+    colorfyWarning.innerHTML = chrome.i18n.getMessage("warningElement");
+    
     let elArr = [];
+    if (element.nodeName == "IFRAME"){
+      let checkWarning = document.getElementById("colorfy_impossible")
+      if(!checkWarning)
+        document.getElementsByTagName("body")[0].appendChild(colorfyWarning);
+    }
+    else{
+      let checkWarning = document.getElementById("colorfy_impossible")
+      if(checkWarning)
+        document.getElementsByTagName("body")[0].removeChild(checkWarning);
+    }
     if (element.id)
       elArr.push(document.getElementById(element.id));
     else if (element.className)
