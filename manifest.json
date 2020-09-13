@@ -1,19 +1,19 @@
 {
   "name": "Colorfy",
   "description": "__MSG_description__",
-  "version": "0.9.2",
+  "version": "0.9.3.5",
   "author": "Nikola Mandić",
   "manifest_version": 2,
   "default_locale": "en",
   "icons": {
-    "16": "icon_16.png",
-    "32": "icon_32.png",
-    "64": "icon_64.png",
-    "128": "icon_128.png"
+    "16": "logo_16.png",
+    "32": "logo_32.png",
+    "64": "logo_64.png",
+    "128": "logo_128.png"
   },
-  "web_accessible_resources": ["images/*", "colorfy.css"],
+  "web_accessible_resources": ["assets/*", "colorfy.css"],
   "browser_action": {
-    "default_icon": "icon.png"
+    "default_icon": "logo.png"
   },
   "background": {
     "scripts": [

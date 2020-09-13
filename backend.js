@@ -25,7 +25,12 @@ const getData = () => {
 
         if (storedData[i]["url"] == getBaseURL()) {
           storedColors = storedData[i]["elements"];
+          // console.warn('storedColors ', storedColors)
           getSavedChanges(storedColors);
+          setTimeout(function(){getSavedChanges(storedColors);}, 1000);
+          setTimeout(function(){getSavedChanges(storedColors);}, 2000);
+          setTimeout(function(){getSavedChanges(storedColors);}, 3000);
+          setTimeout(function(){getSavedChanges(storedColors);}, 5000);
         }
       }
     }
@@ -45,6 +50,7 @@ const changeFormat = data => {
  * @param {Object} el JSON object with information about element that needs to be saved
  */
 const saveElement = el => {
+  console.log("ELEMENT", el)
   //Used to check if the elment already exists
   let removeIndex = null;
   if (storedColors.length > 0) {
@@ -194,24 +200,32 @@ const getSavedChanges = (data) => {
       let selectedTextColor = data[i].color;
       //Change color for each DOM element
       for (let index = 0; index < selectedElements.length; index++) {
-        const element = selectedElements[index];
-        element.style.setProperty(
-          "background",
-          selectedBackgroundColor,
-          "important"
-        );
-        element.style.setProperty(
-          "background",
-          selectedBackground,
-          "important"
-        );
-        element.style.setProperty("color", "none", "important");
-        element.style.setProperty("color", selectedTextColor, "important");
-        //Change text color of all elements nested inside original element
-        let family = element.getElementsByTagName("*");
-        for (let i = 0, len = family.length; i < len; i++) {
-          family[i].style.setProperty("color", "none", "important");
-          family[i].style.setProperty("color", selectedTextColor, "important");
+        try{
+          const element = selectedElements[index];
+          element.style.setProperty(
+            "background",
+            selectedBackgroundColor,
+            "important"
+          );
+          element.style.setProperty(
+            "background",
+            selectedBackground,
+            "important"
+          );
+          element.style.setProperty("color", "none", "important");
+          element.style.setProperty("color", selectedTextColor, "important");
+          //Change text color of all elements nested inside original element
+          let family = element.getElementsByTagName("*");
+          for (let i = 0, len = family.length; i < len; i++) {
+            if(family[i].className.includes("__Colorfy"))
+              continue;
+              
+            family[i].style.setProperty("color", "none", "important");
+            family[i].style.setProperty("color", selectedTextColor, "important");
+          }
+        }
+        catch(err){
+          // console.log("Colorfy extension can't change element: ", selectedElements[index]);
         }
       }
     }

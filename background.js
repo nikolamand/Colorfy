@@ -2,7 +2,9 @@
  * Create onClick action for the extension icon
  */
 chrome.browserAction.onClicked.addListener(function (tab) {
-	chrome.tabs.executeScript(null, { file: "main.js" });
+	chrome.tabs.executeScript(null, { file: "vanilla-picker.min.js" }, function() {
+		chrome.tabs.executeScript(null, { file: "main.js" });
+	});
 });
 
 /**
