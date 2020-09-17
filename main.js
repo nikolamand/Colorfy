@@ -35,7 +35,11 @@
     "linear-gradient(to right, #b8cbb8 0%, #b8cbb8 0%, #b465da 0%, #cf6cc9 33%, #ee609c 66%, #ee609c 100%)",
     "linear-gradient(to right, rgba(149,149,149,1) 0%, rgba(44,62,80,1) 100%)",
     "linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%)",
-    "linear-gradient(to right, #6a11cb 0%, #2575fc 100%)"
+    "linear-gradient(to right, #6a11cb 0%, #2575fc 100%)",
+    "linear-gradient(to right, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%), radial-gradient(at top center, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.40) 120%) #989898",
+    "linear-gradient(to right, #eea2a2 0%, #bbc1bf 19%, #57c6e1 42%, #b49fda 79%, #7ac5d8 100%)",
+    "linear-gradient(to right, #dbdcd7 0%, #dddcd7 24%, #e2c9cc 30%, #e7627d 46%, #b8235a 59%, #801357 71%, #3d1635 84%, #1c1a27 100%)",
+    "linear-gradient(to right, #434343 0%, black 100%)",
   ]
 
   const init = () => {
@@ -106,7 +110,7 @@
     let savedItemsButton = document.createElement("div")
     savedItemsButton.id = "saved_items_button";
     savedItemsButton.className = "saved_items_button__Colorfy";
-    savedItemsButton.innerHTML = '<i class="fa fa-cog"></i>';
+    savedItemsButton.innerHTML = '<i class="fa fa-cog awesome__Colorfy"></i>';
     savedItemsButton.title = "Advanced changes";
     paletteWrapper.appendChild(savedItemsButton);
 
@@ -167,27 +171,32 @@
     let manualInputAdd = document.createElement("div")
     manualInputAdd.id = "manual_input_add";
     manualInputAdd.className = "manual_input_add__Colorfy";
-    manualInputAdd.innerHTML = '<i class="fa fa-check"></i>';
+    manualInputAdd.innerHTML = '<i class="fa fa-check awesome__Colorfy"></i>';
+    manualInputAdd.title = "Add item";
     manualButtonsWrapper.appendChild(manualInputAdd);
 
     let manualInputCancel = document.createElement("div")
     manualInputCancel.id = "manual_input_cancel";
     manualInputCancel.className = "manual_input_cancel__Colorfy";
-    manualInputCancel.innerHTML = '<i class="fa fa-times"></i>';
+    manualInputCancel.innerHTML = '<i class="fa fa-times awesome__Colorfy"></i>';
+    manualInputCancel.title = "Cancel";
     manualButtonsWrapper.appendChild(manualInputCancel);
 
     let manualInputShow = document.createElement("div")
     manualInputShow.id = "manual_input_show";
     manualInputShow.className = "manual_input_show__Colorfy";
-    manualInputShow.innerHTML = '<i class="fa fa-plus"></i>';
+    manualInputShow.title = "Add new item";
+    manualInputShow.innerHTML = '<i class="fa fa-plus awesome__Colorfy"></i>';
     optionsWrapper.appendChild(manualInputShow);
 
     manualInputShow.addEventListener("click", function () {
       manualInputWrapper.style.display = 'flex';
+      manualInputShow.style.display = 'none';
     });
 
     manualInputCancel.addEventListener("click", function () {
       manualInputWrapper.style.display = 'none';
+      manualInputShow.style.display = 'block';
     })
 
     manualInputAdd.addEventListener("click", function (event) {
@@ -225,6 +234,7 @@
       manualAdd(manualObject);
 
       manualInputWrapper.style.display = 'none';
+      manualInputShow.style.display = 'block';
 
 
     });
@@ -242,6 +252,32 @@
         optionsWrapper.style.display = 'none';
 
       displaySavedElements(savedElementsWrapper);
+
+      //move options to top if outside viewport
+      const rect = optionsWrapper.getBoundingClientRect();
+      if (rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)) {
+        optionsWrapper.style.setProperty("position", "initial", "important");
+        optionsWrapper.style.setProperty("width", "100%", "important");
+        optionsWrapper.style.setProperty("top", "0", "important");
+      }
+      else {
+        optionsWrapper.style.setProperty("position", "absolute", "important");
+        optionsWrapper.style.setProperty("width", "calc(100% - 20px)", "important");
+        optionsWrapper.style.setProperty("top", "10px", "important");
+
+        let closeOptionsBtn = document.createElement("span");
+        closeOptionsBtn.className = "close_options__Colorfy";
+        closeOptionsBtn.innerHTML = '<i class="fa fa-times awesome__Colorfy"></i>';
+        closeOptionsBtn.title = "Close advanced changes";
+        closeOptionsBtn.onclick = closeColorfy;
+        optionsWrapper.appendChild(closeOptionsBtn);
+        closeOptionsBtn.onclick = () => {
+          document.getElementById('saved_items_button').click();
+        }
+      }
     }
     loadSavedElements();
 
@@ -265,12 +301,18 @@
   }
 
   const deleteSavedElement = (elIndex) => {
-
     storedLocalElements[0].splice(elIndex, 1);
 
     displaySavedElements(document.getElementById("saved_items_wrapper"));
     manualSave(storedLocalElements[0])
+  }
 
+  const editSavedElement = (elIndex, value) => {
+    value = JSON.parse(value);
+    storedLocalElements[0][elIndex] = value;
+
+    displaySavedElements(document.getElementById("saved_items_wrapper"));
+    manualSave(storedLocalElements[0])
   }
 
   /**
@@ -300,7 +342,8 @@
       let deleteElement = document.createElement("button");
       deleteElement.id = "colorfy_delete_" + index;
       deleteElement.className = "delete_saved_button__Colorfy";
-      deleteElement.innerHTML = '<i class="fa fa-trash"></i>';
+      deleteElement.title = "Delete"
+      deleteElement.innerHTML = '<i class="fa fa-trash awesome__Colorfy"></i>';
       elementName.appendChild(deleteElement);
 
       deleteElement.onclick = function () { deleteSavedElement(index) };
@@ -310,14 +353,52 @@
       elementInput.value = JSON.stringify(element, null, 4);
       elementName.appendChild(elementInput);
 
+      elementInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+          editSavedElement(index, elementInput.value);
+        }
+      });
+
     }
   }
+
+  const colapsePreviousElement = (paletteName, text) => {
+    let palette = document.getElementsByClassName("palette-" + paletteName)[0];
+    let colapseButton = document.createElement("div");
+    colapseButton.className = "colapse_button__Colorfy";
+    colapseButton.innerHTML = text + ' <i class="fa fa-plus awesome__Colorfy"></i>';
+
+    colapseButton.addEventListener("click", function () {
+      this.classList.toggle("active");
+      let colapseContent = this.previousElementSibling;
+      let family = colapseContent.getElementsByTagName("*");
+
+      if (colapseContent.style.maxHeight) {
+        colapseContent.style.maxHeight = null;
+        for (let i = 0, len = family.length; i < len; i++) {
+          family[i].style.maxHeight = null;
+          family[i].style.border = null;
+          colapseButton.innerHTML = text + ' <i class="fa fa-minus awesome__Colorfy"></i>';
+        }
+      } else {
+        colapseContent.style.maxHeight = '0';
+        for (let i = 0, len = family.length; i < len; i++) {
+          family[i].style.maxHeight = '0';
+          family[i].style.setProperty("border", "0", "important");
+        }
+        colapseButton.innerHTML = text + ' <i class="fa fa-plus awesome__Colorfy"></i>';
+      }
+    });
+    palette.appendChild(colapseButton);
+  }
+
   /**
    * Adds colors from the array to the selected palette
    * @param {Array} colors Array containing base colors used in both background and text
    * @param {String} paletteName String for palette name, it can be "background" and "text"
+   * @param {Boolean} colapse Boolean value for whether colors should start collapsed or not
    */
-  const addPresetColors = (colors, paletteName) => {
+  const addPresetColors = (colors, paletteName, colapse) => {
     let label = null;
     let presetColors = null;
     let palette = null;
@@ -355,6 +436,15 @@
           input.value = colors[i];
           colorBox.style.background = colors[i];
         });
+      }
+    }
+
+    if (colapse) {
+      let family = presetColors.getElementsByTagName("*");
+      presetColors.style.maxHeight = '0';
+      for (let i = 0, len = family.length; i < len; i++) {
+        family[i].style.maxHeight = '0';
+        family[i].style.setProperty("border", "0", "important");
       }
     }
 
@@ -491,8 +581,10 @@
 
     addCustomColor(paletteName);
 
-    if (paletteName == "background")
-      addPresetColors(colorfyGradients, paletteName)
+    if (paletteName == "background") {
+      addPresetColors(colorfyGradients, paletteName, true);
+      colapsePreviousElement(paletteName, "Gradient colors");
+    }
 
   };
 

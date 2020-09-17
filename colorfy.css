@@ -27,6 +27,7 @@
   -webkit-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
   -moz-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
   box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
+  max-height: calc(100vh - 25px) !important;
 }
 
 .colors_wrapper__Colorfy{
@@ -38,6 +39,7 @@
 
 .colorfy_logo__Colorfy{
   background: white !important;
+  width: 60px;
   padding: 2px !important;
   border-radius: 5px !important;
 }
@@ -65,6 +67,7 @@
   flex-wrap: wrap !important;
   min-width: 260px;
   justify-content: center !important;
+  height: 100% !important;
 }
 
 /* NAMES OF PALETTES */
@@ -114,6 +117,13 @@
   border-radius: 5px !important;
 }
 
+.colapse_button__Colorfy{
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  color: azure !important;
+}
+
 .colorfy_submit__Colorfy {
   box-shadow: inset 0px 1px 3px 0px #91b8b3 !important;
   background: linear-gradient(to bottom, #768d87 5%, #6c7c7c 100%) !important;
@@ -132,7 +142,7 @@
   text-shadow: 0px -1px 0px #2b665e !important;
   height: 40px !important;
   order: 5 !important;
-  margin: 10px calc(50% - 40px) 30px calc(50% - 40px) !important;
+  margin: 10px calc(50% - 40px) 10px calc(50% - 40px) !important;
 }
 
 .colorfy_submit__Colorfy:hover {
@@ -165,11 +175,20 @@
   overflow: auto !important;
 }
 
+.close_options__Colorfy{
+  position: absolute !important;
+  top: 10px !important;
+  left: 10px !important;
+  cursor: pointer !important;
+  color: black !important;
+}
+
 .saved_items_wrapper__Colorfy{
   display: flex !important;
   flex-wrap: wrap !important;
   width: 90% !important;
   margin: 10px auto !important;
+  max-height: 100% !important;
 }
 
 .saved_element_input__Colorfy{
@@ -222,7 +241,7 @@
   padding: 5px !important;
   border-radius: 5px !important;
   margin: 5px !important;
-  width: 20px !important;
+  width: 35px !important;
   text-align: center !important;
   cursor: pointer !important;
 }
@@ -237,10 +256,10 @@
 
 .manual_input_show__Colorfy{
   width: 35px !important;
-  height: 35px !important;
-  display: flex !important;
-  justify-content: space-around !important;
-  align-items: center !important;
+  padding: 10px !important;
+  text-align: center !important;
+  color: black !important;
+  margin: auto !important;
   cursor: pointer !important;
 }
 
@@ -285,7 +304,7 @@
   position: fixed !important;
   background-color: white !important;
   width: 100% !important;
-  text-align: right !important;
+  text-align: center !important;
   z-index: 10000000000 !important;
   color: red !important;
   top: 3px !important;

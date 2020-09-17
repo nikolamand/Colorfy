@@ -25,12 +25,15 @@ const getData = () => {
 
         if (storedData[i]["url"] == getBaseURL()) {
           storedColors = storedData[i]["elements"];
-          // console.warn('storedColors ', storedColors)
+
+          let numberOfElements = storedColors.length.toString();
+          chrome.extension.sendMessage(numberOfElements);
+
           getSavedChanges(storedColors);
-          setTimeout(function(){getSavedChanges(storedColors);}, 1000);
-          setTimeout(function(){getSavedChanges(storedColors);}, 2000);
-          setTimeout(function(){getSavedChanges(storedColors);}, 3000);
-          setTimeout(function(){getSavedChanges(storedColors);}, 5000);
+          setTimeout(function () { getSavedChanges(storedColors); }, 1000);
+          setTimeout(function () { getSavedChanges(storedColors); }, 2000);
+          setTimeout(function () { getSavedChanges(storedColors); }, 3000);
+          setTimeout(function () { getSavedChanges(storedColors); }, 5000);
         }
       }
     }
@@ -50,7 +53,6 @@ const changeFormat = data => {
  * @param {Object} el JSON object with information about element that needs to be saved
  */
 const saveElement = el => {
-  console.log("ELEMENT", el)
   //Used to check if the elment already exists
   let removeIndex = null;
   if (storedColors.length > 0) {
@@ -101,7 +103,7 @@ const elementInfo = e => {
   let elementNodeName = element.nodeName;
   let parent = element.parentNode;
   let parentNode;
-  if(parent.nodeName != "#document")
+  if (parent.nodeName != "#document")
     parentNode = {
       id: parent.id.trim(),
       className: parent.className.trim(),
@@ -112,7 +114,7 @@ const elementInfo = e => {
       id: "#document",
       className: "#document",
       nodeName: "#document"
-    }     
+    }
 
   let el = {
     nodeName: elementNodeName,
@@ -135,7 +137,7 @@ const elementInfo = e => {
 const parentInfo = element => {
   let parent = element.parentNode;
   let parentNode;
-  if(parent.nodeName != "#document")
+  if (parent.nodeName != "#document")
     parentNode = {
       id: parent.id.trim(),
       className: parent.className.trim(),
@@ -146,7 +148,7 @@ const parentInfo = element => {
       id: "#document",
       className: "#document",
       nodeName: "#document"
-    }     
+    }
   return parentNode;
 
 }
@@ -200,7 +202,7 @@ const getSavedChanges = (data) => {
       let selectedTextColor = data[i].color;
       //Change color for each DOM element
       for (let index = 0; index < selectedElements.length; index++) {
-        try{
+        try {
           const element = selectedElements[index];
           element.style.setProperty(
             "background",
@@ -217,14 +219,14 @@ const getSavedChanges = (data) => {
           //Change text color of all elements nested inside original element
           let family = element.getElementsByTagName("*");
           for (let i = 0, len = family.length; i < len; i++) {
-            if(family[i].className.includes("__Colorfy"))
+            if (family[i].className.includes("__Colorfy"))
               continue;
-              
+
             family[i].style.setProperty("color", "none", "important");
             family[i].style.setProperty("color", selectedTextColor, "important");
           }
         }
-        catch(err){
+        catch (err) {
           // console.log("Colorfy extension can't change element: ", selectedElements[index]);
         }
       }

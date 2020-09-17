@@ -2,11 +2,21 @@
  * Create onClick action for the extension icon
  */
 chrome.browserAction.onClicked.addListener(function (tab) {
-	chrome.tabs.executeScript(null, { file: "vanilla-picker.min.js" }, function() {
+	chrome.tabs.executeScript(null, { file: "vanilla-picker.min.js" }, function () {
 		chrome.tabs.executeScript(null, { file: "main.js" });
 	});
 });
 
+chrome.extension.onMessage.addListener(function (message, sender) {
+	chrome.browserAction.setBadgeText({
+		text: message,
+		tabId: sender.tab.id
+	});
+	chrome.browserAction.setBadgeBackgroundColor({
+		color: '#3C1A5B',
+		tabId: sender.tab.id
+	});
+});
 /**
  * Get basic info about URL
  * @param {string} href Web page URL 
@@ -15,7 +25,7 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 var getLocation = function (href) {
 	var loc = document.createElement("a");
 	loc.href = href;
-	console.log(typeof(loc), loc)
+	console.log(typeof (loc), loc)
 	return loc;
 };
 
@@ -39,7 +49,7 @@ const getBaseURL = url => {
 const clearColors = () => {
 	let storedData = [];
 	let clear = confirm(chrome.i18n.getMessage("pageResetConfirm"));
-	if(clear){
+	if (clear) {
 		chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 			chrome.storage.local.get(["Colorfy"], function (data) {
 				if (data["Colorfy"]) {
