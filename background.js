@@ -74,7 +74,7 @@ const clearColors = () => {
  * Create right click option for removal of the saved changes
  */
 chrome.contextMenus.create({
-	"id": "knkcpioaicifeajdcfjejagihgmlehfn",
+	"id": chrome.runtime.id,
 	"title": chrome.i18n.getMessage("pageReset"),
 	"contexts": ["page", "browser_action"]
 });

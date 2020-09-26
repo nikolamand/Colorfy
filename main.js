@@ -49,11 +49,15 @@
     style.type = "text/css";
     style.href = "./colorfy.css";
     document.getElementsByTagName("body")[0].appendChild(style);
-    let fontAwesome = document.createElement("link");
-    fontAwesome.rel = "stylesheet";
-    fontAwesome.type = "text/css";
-    fontAwesome.href = "./assets/fontawesome/css/all.css";
-    document.getElementsByTagName("body")[0].appendChild(fontAwesome);
+    // let fontAwesome = document.createElement("link");
+    // fontAwesome.rel = "stylesheet";
+    // fontAwesome.type = "text/css";
+    // fontAwesome.href = "./assets/fontawesome/css/all.css";
+    // document.getElementsByTagName("body")[0].appendChild(fontAwesome);
+    let fontAwesomeCDN = document.createElement("script");
+    fontAwesomeCDN.src = "https://kit.fontawesome.com/ecd17d3182.js";
+    fontAwesomeCDN.crossorigin = "anonymous";
+    document.getElementsByTagName("body")[0].appendChild(fontAwesomeCDN);
 
     //Dummy element used to check if the listeners have already been added
     let colorfyCheck = document.getElementById("colorfy_check");
@@ -294,8 +298,12 @@
   }
 
   const manualAdd = object => {
-    storedLocalElements[0].push(object);
+    if(storedLocalElements[0])
+      storedLocalElements[0].push(object);
+    else
+      storedLocalElements[0] = [object];
     manualSave(storedLocalElements[0]);
+    getSavedChanges(storedLocalElements[0]);
     displaySavedElements(document.getElementById("saved_items_wrapper"));
 
   }
@@ -337,29 +345,30 @@
 
   const displaySavedElements = (elementName) => {
     elementName.innerHTML = '';
-    for (let index = 0; index < storedLocalElements[0].length; index++) {
-      const element = storedLocalElements[0][index];
-      let deleteElement = document.createElement("button");
-      deleteElement.id = "colorfy_delete_" + index;
-      deleteElement.className = "delete_saved_button__Colorfy";
-      deleteElement.title = "Delete"
-      deleteElement.innerHTML = '<i class="fa fa-trash awesome__Colorfy"></i>';
-      elementName.appendChild(deleteElement);
+    if (storedLocalElements[0])
+      for (let index = 0; index < storedLocalElements[0].length; index++) {
+        const element = storedLocalElements[0][index];
+        let deleteElement = document.createElement("button");
+        deleteElement.id = "colorfy_delete_" + index;
+        deleteElement.className = "delete_saved_button__Colorfy";
+        deleteElement.title = "Delete"
+        deleteElement.innerHTML = '<i class="fa fa-trash awesome__Colorfy"></i>';
+        elementName.appendChild(deleteElement);
 
-      deleteElement.onclick = function () { deleteSavedElement(index) };
+        deleteElement.onclick = function () { deleteSavedElement(index) };
 
-      let elementInput = document.createElement("textarea")
-      elementInput.className = "saved_element_input__Colorfy";
-      elementInput.value = JSON.stringify(element, null, 4);
-      elementName.appendChild(elementInput);
+        let elementInput = document.createElement("textarea")
+        elementInput.className = "saved_element_input__Colorfy";
+        elementInput.value = JSON.stringify(element, null, 4);
+        elementName.appendChild(elementInput);
 
-      elementInput.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          editSavedElement(index, elementInput.value);
-        }
-      });
+        elementInput.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            editSavedElement(index, elementInput.value);
+          }
+        });
 
-    }
+      }
   }
 
   const colapsePreviousElement = (paletteName, text) => {
