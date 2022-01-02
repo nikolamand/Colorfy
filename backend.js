@@ -3,7 +3,7 @@
 let storedData = [];
 // Array with DOM elements for the given URL
 let storedColors = [];
-console.log("aaa")
+console.log("aaaa")
 /**
  * Get base URL for the currently opened tab
  * @return {string} Base URL for the page on the currently opened tab
