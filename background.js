@@ -7,8 +7,6 @@ chrome.browserAction.onClicked.addListener(function (tab) {
 	});
 });
 
-console.log('test');
-
 chrome.extension.onMessage.addListener(function (message, sender) {
 	chrome.browserAction.setBadgeText({
 		text: message,
