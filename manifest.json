@@ -16,30 +16,19 @@
     "default_icon": "logo.png"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ],
+    "scripts": ["background.js"],
     "persistent": false
   },
   "incognito": "spanning",
   "content_scripts": [
     {
-      "matches": [
-        "*://*/*",
-        "file://*/*"
-      ],
+      "matches": ["*://*/*", "file://*/*"],
       "all_frames": true,
-      "js": [
-        "backend.js"
-      ],
-      "css" : ["colorfy.css"]
+      "js": ["backend.js"],
+      "css": ["colorfy.css"]
     }
   ],
-  "permissions": [
-    "activeTab",
-    "contextMenus",
-    "storage"
-  ],
-  
+  "permissions": ["activeTab", "contextMenus", "storage"],
+
   "options_page": "options/options.html"
 }
