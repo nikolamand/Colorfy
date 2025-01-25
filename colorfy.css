@@ -1,7 +1,11 @@
 /* Using !important so that the css popup stays the same across all websites */
 
+body {
+  --colorfy-font-size: 16px;
+}
+
 /* SITS BENEATH palette_wrapper AND CLOSES MODAL ONCLICK */
-.colorfy_modal__Colorfy{
+.colorfy_modal__Colorfy {
   width: 100% !important;
   height: 100% !important;
   position: fixed !important;
@@ -9,8 +13,8 @@
   left: 0 !important;
   top: 0 !important;
   z-index: 10000980 !important;
-  background-color: rgb(0,0,0) !important;
-  background-color: rgba(0,0,0,0.4) !important;
+  background-color: rgb(0, 0, 0) !important;
+  background-color: rgba(0, 0, 0, 0.4) !important;
 }
 
 .palette_wrapper__Colorfy {
@@ -18,26 +22,22 @@
   left: 15px !important;
   position: fixed !important;
   width: 50% !important;
-  left:25% !important;
+  left: 25% !important;
   padding: 10px !important;
-  background-color: rgb(9, 92, 165) !important;
-  border: 2px solid rgb(41, 41, 41) !important;
   border-radius: 10px !important;
   z-index: 10000990 !important;
-  -webkit-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
-  -moz-box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
-  box-shadow: 20px 20px 30px 0px rgba(0,0,0,0.75) !important;
+  box-shadow: 20px 20px 30px 0px rgba(0, 0, 0, 0.75) !important;
   max-height: calc(100vh - 25px) !important;
 }
 
-.colors_wrapper__Colorfy{
+.colors_wrapper__Colorfy {
   width: 100% !important;
   display: flex !important;
   flex-wrap: wrap !important;
   justify-content: space-between;
 }
 
-.colorfy_logo__Colorfy{
+.colorfy_logo__Colorfy {
   background: white !important;
   width: 60px;
   padding: 2px !important;
@@ -45,7 +45,7 @@
 }
 
 /* X BUTTON */
-.closeColorfy__Colorfy{
+.closeColorfy__Colorfy {
   cursor: pointer !important;
   font-family: Arial !important;
   line-height: initial !important;
@@ -59,7 +59,7 @@
 }
 
 /* INDIVIDUAL PALETTES */
-.palette__Colorfy{
+.palette__Colorfy {
   padding: 10px !important;
   margin: 5px !important;
   width: 40% !important;
@@ -101,7 +101,7 @@
 }
 
 /* WRAPPER DIV FOR PRESET COLORS */
-.colorfy_preset_colors__Colorfy {  
+.colorfy_preset_colors__Colorfy {
   width: 100% !important;
   display: flex !important;
   flex-wrap: wrap !important;
@@ -117,7 +117,7 @@
   border-radius: 5px !important;
 }
 
-.colapse_button__Colorfy{
+.colapse_button__Colorfy {
   background: none !important;
   border: none !important;
   cursor: pointer !important;
@@ -155,7 +155,7 @@
   top: 1px !important;
 }
 
-.saved_items_button__Colorfy{
+.saved_items_button__Colorfy {
   width: 35px !important;
   height: 35px !important;
   display: flex !important;
@@ -166,7 +166,7 @@
   margin-left: 97% !important;
 }
 
-.options_wrapper__Colorfy{
+.options_wrapper__Colorfy {
   display: none;
   height: 400px !important;
   width: 100% !important;
@@ -175,7 +175,7 @@
   overflow: auto !important;
 }
 
-.close_options__Colorfy{
+.close_options__Colorfy {
   position: absolute !important;
   top: 10px !important;
   left: 10px !important;
@@ -183,7 +183,7 @@
   color: black !important;
 }
 
-.saved_items_wrapper__Colorfy{
+.saved_items_wrapper__Colorfy {
   display: flex !important;
   flex-wrap: wrap !important;
   width: 90% !important;
@@ -191,13 +191,13 @@
   max-height: 100% !important;
 }
 
-.saved_element_input__Colorfy{
+.saved_element_input__Colorfy {
   width: calc(100% - 100px) !important;
   margin: 10px !important;
   height: 120px;
 }
 
-.delete_saved_button__Colorfy{
+.delete_saved_button__Colorfy {
   width: 35px !important;
   height: 35px !important;
   border: 3px solid midnightblue !important;
@@ -208,27 +208,27 @@
   cursor: pointer !important;
 }
 
-.manual_input_wrapper__Colorfy{
+.manual_input_wrapper__Colorfy {
   display: none;
   flex-wrap: wrap !important;
   width: 50% !important;
   margin: auto !important;
-  border: 5px solid rgba(28,110,164,0.65) !important;
+  border: 5px solid rgba(28, 110, 164, 0.65) !important;
   border-radius: 24px !important;
   padding: 0 10px 10px 10px !important;
 }
 
-.manual_input_elment__Colorfy{
+.manual_input_elment__Colorfy {
   background: lightcyan !important;
   width: 100% !important;
 }
 
-.input_label__Colorfy{
+.input_label__Colorfy {
   margin-top: 10px !important;
   color: black !important;
 }
 
-.manual_buttons_wrapper__Colorfy{
+.manual_buttons_wrapper__Colorfy {
   width: 100% !important;
   margin-top: 10px !important;
   display: flex !important;
@@ -236,7 +236,8 @@
   flex-wrap: wrap !important;
 }
 
-.manual_input_cancel__Colorfy, .manual_input_add__Colorfy{
+.manual_input_cancel__Colorfy,
+.manual_input_add__Colorfy {
   border: 3px solid midnightblue !important;
   padding: 5px !important;
   border-radius: 5px !important;
@@ -246,15 +247,15 @@
   cursor: pointer !important;
 }
 
-.manual_input_add__Colorfy{
+.manual_input_add__Colorfy {
   color: green !important;
 }
 
-.manual_input_cancel__Colorfy{
+.manual_input_cancel__Colorfy {
   color: red !important;
 }
 
-.manual_input_show__Colorfy{
+.manual_input_show__Colorfy {
   width: 35px !important;
   padding: 10px !important;
   text-align: center !important;
@@ -264,7 +265,7 @@
 }
 
 /* WRAPPER FOR DEFAULT AND CUSTOM COLORS */
-.individual_color_wrapper__Colorfy{
+.individual_color_wrapper__Colorfy {
   width: 100% !important;
   margin: auto !important;
   display: flex !important;
@@ -284,10 +285,11 @@
   align-items: center !important;
   color: black !important;
   font-family: Arial !important;
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
+    1px 1px 0 #fff;
 }
 
-.colorfy_default_color__Colorfy{
+.colorfy_default_color__Colorfy {
   width: 80% !important;
   font-size: 20px !important;
   margin: 5px auto !important;
@@ -300,7 +302,7 @@
 }
 
 /* WARNING THAT APPEARS WHEN TRYING TO CHANGE IFRAME */
-.colorfy_impossible__Colorfy{
+.colorfy_impossible__Colorfy {
   position: fixed !important;
   background-color: white !important;
   width: 100% !important;
@@ -311,4 +313,27 @@
   font-size: 30px !important;
   font-weight: 30px !important;
   padding: 3px 20px !important;
+}
+
+/* Light scheme */
+.Colorfy_light-scheme {
+  background-color: #ffffff !important;
+  border: 2px solid #dddddd !important;
+  color: #333333 !important;
+}
+
+.Colorfy_light-scheme .palette_info__Colorfy {
+  color: #333333 !important;
+  border-color: #333333 !important;
+}
+
+.Colorfy_light-scheme .colapse_button__Colorfy {
+  color: #333333 !important;
+}
+
+/* Dark scheme */
+.Colorfy_dark-scheme {
+  background-color: #333333 !important;
+  border: 2px solid #444444 !important;
+  color: #ffffff !important;
 }

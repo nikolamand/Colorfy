@@ -1,45 +1,86 @@
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #222;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-		body {
-			background-color: #0e1426;
-			background-image: url("../assets/images/clean-gray-paper.png");
-		}
+.options-container {
+  width: 400px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+}
 
-		.modal-body {
-			display: flex;
-			width: 100vw;
-			height: 100vh;
-			justify-content: center;
-			align-items: center;
-		}
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #222;
+}
 
-		#clear_all_changes {
-			display: inline-block;
-			padding: 0.5em 3em;
-			border: 0.16em solid #FFFFFF;
-			margin: 0 0.3em 0.3em 0;
-			box-sizing: border-box;
-			text-decoration: none;
-			text-transform: uppercase;
-			font-family: 'Roboto', sans-serif;
-			font-weight: 400;
-			color: #444444;
-			text-align: center;
-			transition: all 0.15s;
-		}
+.option {
+  margin-bottom: 15px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-		#clear_all_changes:hover {
-			color: #DDDDDD;
-			border-color: #DDDDDD;
-		}
+.option-control {
+  width: 50%;
+}
 
-		#clear_all_changes:active {
-			color: #BBBBBB;
-			border-color: #BBBBBB;
-		}
+label {
+  font-size: 16px;
+  display: block;
+}
 
-		@media all and (max-width:30em) {
-			#clear_all_changes {
-				display: block;
-				margin: 0.4em auto;
-			}
-		}
+select,
+input[type="checkbox"] {
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+
+.buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+button#reset-settings {
+  background-color: #f44336;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  background-color: #3e8e41;
+}

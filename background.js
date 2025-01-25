@@ -1,82 +1,96 @@
 /**
- * Create onClick action for the extension icon
+ * In Manifest V3, the background script is a service worker.
+ * We cannot directly use alerts/confirms here — they simply won't work.
+ * We also replace chrome.browserAction with chrome.action.
  */
-chrome.browserAction.onClicked.addListener(function (tab) {
-	chrome.tabs.executeScript(null, { file: "vanilla-picker.min.js" }, function () {
-		chrome.tabs.executeScript(null, { file: "main.js" });
-	});
+chrome.action.onClicked.addListener((tab) => {
+  // Use the 'chrome.scripting' API to inject scripts into the page
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["vanilla-picker.min.js", "main.js"] // Adjust paths as needed
+  });
 });
 
-chrome.extension.onMessage.addListener(function (message, sender) {
-	chrome.browserAction.setBadgeText({
-		text: message,
-		tabId: sender.tab.id
-	});
-	chrome.browserAction.setBadgeBackgroundColor({
-		color: '#3C1A5B',
-		tabId: sender.tab.id
-	});
-});
 /**
- * Get basic info about URL
- * @param {string} href Web page URL 
- * @return {object} Object with info from the provided URL
+ * Listen for messages from content scripts.
+ * (Replacing chrome.extension.onMessage with chrome.runtime.onMessage)
  */
-var getLocation = function (href) {
-	var loc = document.createElement("a");
-	loc.href = href;
-	console.log(typeof (loc), loc)
-	return loc;
-};
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'updateBadge') {
+    chrome.action.setBadgeText({
+      text: message.text,
+      tabId: sender.tab.id
+    });
+    chrome.action.setBadgeBackgroundColor({
+      color: "#3C1A5B",
+      tabId: sender.tab.id
+    });
+  }
+  // Always call sendResponse if you expect to keep the channel open or confirm receipt
+  sendResponse({status: 'ok'});
+});
 
 /**
- * Returns base URL
- * @param {string} url Optional URL in form of a string (if not provided takes url from the currently opened tab) 
- * @return {string} Base URL in form of a string
+ * Helper: get base URL from a given string URL
  */
-const getBaseURL = url => {
-	if (url == undefined)
-		url = window.location;
-	else
-		url = getLocation(url);
-	let baseUrl = url.protocol + "//" + url.host;
-	return baseUrl;
+function getBaseURL(urlString) {
+  try {
+    const urlObj = new URL(urlString);
+    return urlObj.origin; // e.g. "https://example.com"
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
- * Remove saved colors for the URL of the currently opened tab
+ * Remove saved colors for the URL of the currently opened tab.
+ * We cannot confirm with the user here (no alerts/confirm in service worker).
+ * If you want a confirm, do it from the content script or options page.
  */
-const clearColors = () => {
-	let storedData = [];
-	let clear = confirm(chrome.i18n.getMessage("pageResetConfirm"));
-	if (clear) {
-		chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-			chrome.storage.local.get(["Colorfy"], function (data) {
-				if (data["Colorfy"]) {
-					storedData = JSON.parse(data["Colorfy"]);
-					let removeIndex = null;
-					for (let i = 0, len = storedData.length; i < len; i++) {
-						if (storedData[i]['url'] == getBaseURL(tabs[0].url)) {
-							removeIndex = i;
-						}
-					}
-					if (removeIndex != null) storedData.splice(removeIndex, 1);
-					storedData = JSON.stringify(storedData);
-					chrome.storage.local.set({ "Colorfy": storedData });
-				}
-			});
-		});
-		chrome.tabs.reload();
-	}
+function clearColorsForActiveTab() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs.length) return;
+    const url = tabs[0].url;
+    const base = getBaseURL(url);
+
+    if (!base) return;
+
+    chrome.storage.local.get(["Colorfy"], (data) => {
+      if (data["Colorfy"]) {
+        let storedData = JSON.parse(data["Colorfy"]) || [];
+        // Find the record with the matching base URL
+        const index = storedData.findIndex(item => item.url === base);
+        if (index > -1) {
+          storedData.splice(index, 1);
+          chrome.storage.local.set({ Colorfy: JSON.stringify(storedData) }, () => {
+            // Reload after clearing
+            chrome.tabs.reload(tabs[0].id);
+          });
+        }
+      }
+    });
+  });
 }
 
 /**
- * Create right click option for removal of the saved changes
+ * Create right-click option for removal of the saved changes.
+ * We'll do this on extension install/update. 
  */
-chrome.contextMenus.create({
-	"id": chrome.runtime.id,
-	"title": chrome.i18n.getMessage("pageReset"),
-	"contexts": ["page", "browser_action"]
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "clearColors",
+    title: chrome.i18n.getMessage("pageReset"),
+    contexts: ["page"]
+  });
 });
 
-chrome.contextMenus.onClicked.addListener(clearColors)
+/**
+ * Handle clicks on the context menu item
+ */
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "clearColors") {
+    // In a service worker, we can't show alerts/confirms. 
+    // If you still want to confirm, do it in the content script or the options page.
+    clearColorsForActiveTab();
+  }
+});

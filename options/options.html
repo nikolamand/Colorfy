@@ -1,19 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Colorfy Options</title>
+    <link rel="stylesheet" type="text/css" href="options.css" />
+  </head>
+  <body>
+    <div class="options-container">
+      <h1>Colorfy Options</h1>
+      <div class="option">
+        <label for="color-scheme">Color Scheme:</label>
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="ie=edge">
-	<title>Colorfy Options</title>
-	<link rel="stylesheet" type="text/css" href="options.css">
-</head>
-
-<body>
-	<div class="modal-body">
-		<input type="button" id="clear_all_changes" value="">
-	</div>
-	<script src="options.js"></script>
-</body>
-
+        <div class="option-control">
+          <select id="color-scheme">
+            <option value="system">System Default</option>
+            <option value="dark">Dark Mode</option>
+            <option value="light">Light Mode</option>
+          </select>
+        </div>
+      </div>
+      <div class="option">
+        <label for="use-gradients">Enable Gradient Colors:</label>
+        <div class="option-control">
+          <input type="checkbox" id="use-gradients" checked />
+        </div>
+      </div>
+      <div class="option">
+        <label for="clear-data">Clear Data:</label>
+        <div class="option-control">
+          <button id="clear_all_changes">Clear Data</button>
+        </div>
+      </div>
+      <div class="buttons">
+        <button id="save-settings">Save Settings</button>
+        <button id="reset-settings">Reset to Default</button>
+      </div>
+    </div>
+    <script src="options.js"></script>
+  </body>
 </html>

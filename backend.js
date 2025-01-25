@@ -1,246 +1,236 @@
-
 // Array of JSON objects for the whole chrome.storage
 let storedData = [];
 // Array with DOM elements for the given URL
 let storedColors = [];
 
 /**
- * Get base URL for the currently opened tab
- * @return {string} Base URL for the page on the currently opened tab
+ * Get base URL for current tab
  */
-const getBaseURL = () => {
-  let getUrl = window.location;
-  let baseUrl = getUrl.protocol + "//" + getUrl.host;
-  return baseUrl;
+function getBaseURL() {
+  const { protocol, host } = window.location;
+  return `${protocol}//${host}`;
 }
 
 /**
- * Get the data stored in chrome.storage and call the function that changes element colors (getSavedChanges)
+ * Fetch from storage, then apply changes for the current page
  */
-const getData = () => {
-  chrome.storage.local.get(["Colorfy"], function (data) {
+function getData() {
+  chrome.storage.local.get(["Colorfy"], (data) => {
     if (data["Colorfy"]) {
-      storedData = changeFormat(data["Colorfy"])
-      for (let i = 0, len = storedData.length; i < len; i++) {
+      storedData = changeFormat(data["Colorfy"]);
+      const currentBase = getBaseURL();
+      for (let i = 0; i < storedData.length; i++) {
+        if (storedData[i].url === currentBase) {
+          storedColors = storedData[i].elements;
+          // Notify background to update the badge
+          chrome.runtime.sendMessage({
+            type: "updateBadge",
+            text: storedColors.length.toString()
+          });
 
-        if (storedData[i]["url"] == getBaseURL()) {
-          storedColors = storedData[i]["elements"];
-
-          let numberOfElements = storedColors.length.toString();
-          chrome.extension.sendMessage(numberOfElements);
-
+          // Apply the changes multiple times to ensure the DOM is ready
           getSavedChanges(storedColors);
-          setTimeout(function () { getSavedChanges(storedColors); }, 1000);
-          setTimeout(function () { getSavedChanges(storedColors); }, 2000);
-          setTimeout(function () { getSavedChanges(storedColors); }, 3000);
-          setTimeout(function () { getSavedChanges(storedColors); }, 5000);
+          setTimeout(() => getSavedChanges(storedColors), 1000);
+          setTimeout(() => getSavedChanges(storedColors), 2000);
+          setTimeout(() => getSavedChanges(storedColors), 3000);
+          setTimeout(() => getSavedChanges(storedColors), 5000);
         }
       }
     }
   });
 }
+
+/**
+ * Listen to changes in storage and re-run getData
+ * (Important: pass the function reference, not the function call)
+ */
+chrome.storage.onChanged.addListener(getData);
+
+// Run at script load
 getData();
 
-chrome.storage.onChanged.addListener(getData());
-
-const changeFormat = data => {
-  let elements = JSON.parse(data);
+/**
+ * Convert the stored JSON string to an array of objects
+ */
+function changeFormat(data) {
+  const elements = JSON.parse(data);
+  // ensures we get a normal array
   return Object.values(elements);
 }
 
 /**
- * Save element to chrome.storage
- * @param {Object} el JSON object with information about element that needs to be saved
+ * Save/update a single element into our storedColors array, then store them
  */
-const saveElement = el => {
-  //Used to check if the elment already exists
+function saveElement(el) {
+  // Check if the element already exists
   let removeIndex = null;
-  if (storedColors.length > 0) {
-    for (let i = 0, len = storedColors.length; i < len; i++) {
-      if (
-        storedColors[i].nodeName == el.nodeName &&
-        storedColors[i].id == el.id &&
-        storedColors[i].className == el.className
-      )
-        removeIndex = i;
-    }
-    //Remove element, so that it can be added to the end of array
-    if (removeIndex != null) storedColors.splice(removeIndex, 1);
-    storedColors.push(el);
-  }
-  //Initiate element if it is getting saved for the first time
-  else {
-    storedColors = [el];
-  }
-
-  let changedStoredData = null;
-  for (let i = 0, len = storedData.length; i < len; i++) {
-    if (storedData[i]["url"] == getBaseURL()) {
-      storedData[i]["elements"] = storedColors;
-      changedStoredData = i;
+  for (let i = 0; i < storedColors.length; i++) {
+    if (
+      storedColors[i].nodeName === el.nodeName &&
+      storedColors[i].id === el.id &&
+      storedColors[i].className === el.className
+    ) {
+      removeIndex = i;
+      break;
     }
   }
+  // Remove so we can re-add at the end
+  if (removeIndex !== null) {
+    storedColors.splice(removeIndex, 1);
+  }
+  storedColors.push(el);
 
-  //Add a new element to storedData(chrome.storage) if it hasn't been changed
-  if (changedStoredData === null)
-    storedData.push({ 'url': getBaseURL(), 'elements': storedColors });
-  //Save elements to chrome.storage
-  chrome.storage.local.set({ "Colorfy": JSON.stringify(storedData) });
-};
+  // Update storedData for the current URL
+  const currentBase = getBaseURL();
+  let foundIndex = null;
+  for (let i = 0; i < storedData.length; i++) {
+    if (storedData[i].url === currentBase) {
+      storedData[i].elements = storedColors;
+      foundIndex = i;
+      break;
+    }
+  }
+  // If we didn't find the current url in storedData, push a new record
+  if (foundIndex === null) {
+    storedData.push({ url: currentBase, elements: storedColors });
+  }
+
+  // Persist back to chrome.storage
+  chrome.storage.local.set({ Colorfy: JSON.stringify(storedData) });
+}
 
 /**
- * Take DOM element and return it's information in JSON form
- * @param {DOM} e DOM element
- * @return {Object} JSON object with element information
+ * Returns a structured object with details about a DOM element
  */
-const elementInfo = e => {
-  let element = e.target;
-  let elementId = element.id;
-  let background = element.style.background;
-  let backgroundColor = element.style.backgroundColor;
-  let color = element.style.color;
-  let elementClass = element.className;
-  let elementNodeName = element.nodeName;
-  let parent = element.parentNode;
-  let parentNode;
-  if (parent.nodeName != "#document")
-    parentNode = {
-      id: parent.id.trim(),
-      className: parent.className.trim(),
-      nodeName: parent.nodeName
-    }
-  else
-    parentNode = {
-      id: "#document",
-      className: "#document",
-      nodeName: "#document"
-    }
+function elementInfo(e) {
+  const element = e.target;
+  const {
+    id,
+    style: { background, backgroundColor, color },
+    className,
+    nodeName
+  } = element;
 
-  let el = {
-    nodeName: elementNodeName,
-    id: elementId.trim(),
-    className: elementClass.trim(),
-    background: background,
-    backgroundColor: backgroundColor,
-    color: color,
-    parentNode: parentNode
+  const parent = element.parentNode;
+  let parentNode = {
+    id: "#document",
+    className: "#document",
+    nodeName: "#document"
   };
-  console.log(el)
-  return el;
-};
-
-/**
- * Get the info about elements parent, used for elements with only tagName, 
- * so that we dont change all elements with that tag across entire website.
- * @param {Object} element HTML element
- */
-const parentInfo = element => {
-  let parent = element.parentNode;
-  let parentNode;
-  if (parent.nodeName != "#document")
+  if (parent && parent.nodeName !== "#document") {
     parentNode = {
       id: parent.id.trim(),
       className: parent.className.trim(),
       nodeName: parent.nodeName
-    }
-  else
-    parentNode = {
+    };
+  }
+
+  return {
+    nodeName,
+    id: id.trim(),
+    className: className.trim(),
+    background,
+    backgroundColor,
+    color,
+    parentNode
+  };
+}
+
+/**
+ * Helper to get the parent node details
+ */
+function parentInfo(element) {
+  const parent = element.parentNode;
+  if (!parent || parent.nodeName === "#document") {
+    return {
       id: "#document",
       className: "#document",
       nodeName: "#document"
-    }
-  return parentNode;
-
-}
-
-/**
- * Check if the two objects are identical
- * @param {Object} first
- * @param {Object} second 
- */
-const checkParents = (first, second) => {
-  if (first.id == second.id && first.className == second.className && first.nodeName == second.nodeName)
-    return true;
-  else
-    return false
-}
-
-/**
- * Get DOM elements with provided information/element
- * @param {DOM} e DOM element or JSON object with structure like elementInfo function's return value
- * @return {string[DOM]} array of DOM elements
- */
-const selectElements = e => {
-  let element;
-  if (e.target) element = e.target;
-  else element = e;
-  let elArr = [];
-  if (element.id) elArr.push(document.getElementById(element.id));
-  else if (element.className)
-    elArr = document.getElementsByClassName(element.className);
-  else if (element.nodeName) {
-    let tmp = document.getElementsByTagName(element.nodeName);
-    for (let i = 0, len = tmp.length; i < len; i++) {
-      if (checkParents(element.parentNode, parentInfo(tmp[i])))
-        elArr.push(tmp[i]);
-    }
+    };
   }
-  return elArr;
-};
+  return {
+    id: parent.id.trim(),
+    className: parent.className.trim(),
+    nodeName: parent.nodeName
+  };
+}
 
 /**
- * Change background colors for the given elements
- * @param {array} data 
+ * Compare two parent objects
  */
-const getSavedChanges = (data) => {
-  if (data) {
-    for (let i = 0, len = data.length; i < len; i++) {
-      //Get DOM elements
-      let selectedElements = selectElements(data[i]);
-      let selectedBackground = data[i].background;
-      let selectedBackgroundColor = data[i].backgroundColor;
-      let selectedTextColor = data[i].color;
-      //Change color for each DOM element
-      for (let index = 0; index < selectedElements.length; index++) {
-        try {
-          const element = selectedElements[index];
-          element.style.setProperty(
-            "background",
-            selectedBackgroundColor,
-            "important"
-          );
-          element.style.setProperty(
-            "background",
-            selectedBackground,
-            "important"
-          );
-          element.style.setProperty("color", "none", "important");
-          element.style.setProperty("color", selectedTextColor, "important");
-          //Change text color of all elements nested inside original element
-          let family = element.getElementsByTagName("*");
-          for (let i = 0, len = family.length; i < len; i++) {
-            if (family[i].className.includes("__Colorfy"))
-              continue;
+function checkParents(first, second) {
+  return (
+    first.id === second.id &&
+    first.className === second.className &&
+    first.nodeName === second.nodeName
+  );
+}
 
-            family[i].style.setProperty("color", "none", "important");
-            family[i].style.setProperty("color", selectedTextColor, "important");
-          }
-        }
-        catch (err) {
-          // console.log("Colorfy extension can't change element: ", selectedElements[index]);
-        }
+/**
+ * Given an element-like descriptor, return all matching DOM elements
+ */
+function selectElements(e) {
+  const element = e.target || e;
+  let elArr = [];
+
+  if (element.id) {
+    const found = document.getElementById(element.id);
+    if (found) elArr.push(found);
+  } else if (element.className) {
+    elArr = document.getElementsByClassName(element.className);
+  } else if (element.nodeName) {
+    const tmp = document.getElementsByTagName(element.nodeName);
+    for (let i = 0; i < tmp.length; i++) {
+      if (checkParents(element.parentNode, parentInfo(tmp[i]))) {
+        elArr.push(tmp[i]);
       }
     }
   }
-};
+  return elArr;
+}
 
+/**
+ * Apply color/background changes for a list of stored color definitions
+ */
+function getSavedChanges(data) {
+  if (!data) return;
 
-const clearColors = () => {
-  chrome.storage.local.clear(function () {
-    var error = chrome.runtime.lastError;
+  for (let i = 0; i < data.length; i++) {
+    const selectedElements = selectElements(data[i]);
+    const selectedBackground = data[i].background;
+    const selectedBackgroundColor = data[i].backgroundColor;
+    const selectedTextColor = data[i].color;
+
+    for (let j = 0; j < selectedElements.length; j++) {
+      try {
+        const el = selectedElements[j];
+        el.style.setProperty("background", selectedBackgroundColor, "important");
+        el.style.setProperty("background", selectedBackground, "important");
+        el.style.setProperty("color", "none", "important");
+        el.style.setProperty("color", selectedTextColor, "important");
+
+        // Also change text color of all nested children
+        const family = el.getElementsByTagName("*");
+        for (let k = 0; k < family.length; k++) {
+          if (family[k].className.includes("__Colorfy")) continue;
+          family[k].style.setProperty("color", "none", "important");
+          family[k].style.setProperty("color", selectedTextColor, "important");
+        }
+      } catch (err) {
+        // Silently ignore if we can't change some element
+      }
+    }
+  }
+}
+
+/**
+ * Clear everything from storage (not just the current domain).
+ */
+function clearColors() {
+  chrome.storage.local.clear(() => {
+    const error = chrome.runtime.lastError;
     if (error) {
       console.error(error);
     }
   });
 }
-
