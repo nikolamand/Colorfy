@@ -57,6 +57,12 @@
     styleLink.href = "./colorfy.css";
     document.body.appendChild(styleLink);
 
+    const googleIcons = document.createElement("link");
+    googleIcons.rel = "stylesheet";
+    googleIcons.href =
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined";
+    document.body.appendChild(googleIcons);
+
     applyGradientOption();
 
     // Only add listeners once
@@ -169,7 +175,7 @@
     const savedItemsButton = document.createElement("div");
     savedItemsButton.id = "saved_items_button";
     savedItemsButton.className = "saved_items_button__Colorfy";
-    savedItemsButton.innerHTML = '<i class="fa fa-cog awesome__Colorfy"></i>';
+    savedItemsButton.innerHTML = `<span class="material-symbols-outlined">manufacturing</span>`;
     savedItemsButton.title = "Advanced changes";
     paletteWrapper.appendChild(savedItemsButton);
 
@@ -240,15 +246,14 @@
     const manualInputAdd = document.createElement("div");
     manualInputAdd.id = "manual_input_add";
     manualInputAdd.className = "manual_input_add__Colorfy";
-    manualInputAdd.innerHTML = '<i class="fa fa-check awesome__Colorfy"></i>';
+    manualInputAdd.innerHTML = `<span class="material-symbols-outlined">check_circle</span>`;
     manualInputAdd.title = "Add item";
     manualButtonsWrapper.appendChild(manualInputAdd);
 
     const manualInputCancel = document.createElement("div");
     manualInputCancel.id = "manual_input_cancel";
     manualInputCancel.className = "manual_input_cancel__Colorfy";
-    manualInputCancel.innerHTML =
-      '<i class="fa fa-times awesome__Colorfy"></i>';
+    manualInputCancel.innerHTML = `<span class="material-symbols-outlined">cancel</span>`;
     manualInputCancel.title = "Cancel";
     manualButtonsWrapper.appendChild(manualInputCancel);
 
@@ -257,7 +262,7 @@
     manualInputShow.id = "manual_input_show";
     manualInputShow.className = "manual_input_show__Colorfy";
     manualInputShow.title = "Add new item";
-    manualInputShow.innerHTML = '<i class="fa fa-plus awesome__Colorfy"></i>';
+    manualInputShow.innerHTML = `<span class="material-symbols-outlined">add_circle</span>`;
     optionsWrapper.appendChild(manualInputShow);
 
     manualInputShow.addEventListener("click", () => {
@@ -332,8 +337,7 @@
 
         const closeOptionsBtn = document.createElement("span");
         closeOptionsBtn.className = "close_options__Colorfy";
-        closeOptionsBtn.innerHTML =
-          '<i class="fa fa-times awesome__Colorfy"></i>';
+        closeOptionsBtn.innerHTML = `<span class="material-symbols-outlined">close</span>`;
         closeOptionsBtn.title = "Close advanced changes";
         closeOptionsBtn.onclick = closeColorfy;
         optionsWrapper.appendChild(closeOptionsBtn);
@@ -371,6 +375,7 @@
         item.elements = object;
       }
     });
+    console.log("Manual save:", storedLocalData);
     chrome.storage.local.set({ Colorfy: JSON.stringify(storedLocalData) });
   };
 
@@ -413,7 +418,7 @@
       deleteButton.id = "colorfy_delete_" + i;
       deleteButton.className = "delete_saved_button__Colorfy";
       deleteButton.title = "Delete";
-      deleteButton.innerHTML = '<i class="fa fa-trash awesome__Colorfy"></i>';
+      deleteButton.innerHTML = `<span class="material-symbols-outlined">delete</span>`;
       container.appendChild(deleteButton);
 
       deleteButton.onclick = () => {
@@ -460,7 +465,7 @@
     )[0];
     const collapseButton = document.createElement("div");
     collapseButton.className = "colapse_button__Colorfy";
-    collapseButton.innerHTML = `${text} <i class="fa fa-plus awesome__Colorfy"></i>`;
+    collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">add_circle</span>`;
 
     collapseButton.addEventListener("click", function () {
       this.classList.toggle("active");
@@ -473,14 +478,14 @@
           family[i].style.maxHeight = null;
           family[i].style.border = null;
         }
-        collapseButton.innerHTML = `${text} <i class="fa fa-minus awesome__Colorfy"></i>`;
+        collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">remove</span>`;
       } else {
         collapseContent.style.maxHeight = "0";
         for (let i = 0; i < family.length; i++) {
           family[i].style.maxHeight = "0";
           family[i].style.setProperty("border", "0", "important");
         }
-        collapseButton.innerHTML = `${text} <i class="fa fa-plus awesome__Colorfy"></i>`;
+        collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">add</span>`;
       }
     });
     palette.appendChild(collapseButton);

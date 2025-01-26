@@ -162,7 +162,7 @@ body {
   justify-content: space-around !important;
   align-items: center !important;
   cursor: pointer !important;
-  color: white !important;
+  color: black !important;
   margin-left: 97% !important;
 }
 
@@ -198,11 +198,7 @@ body {
 }
 
 .delete_saved_button__Colorfy {
-  width: 35px !important;
-  height: 35px !important;
-  border: 3px solid midnightblue !important;
   padding: 5px !important;
-  border-radius: 5px !important;
   background: none !important;
   margin: 10px !important;
   cursor: pointer !important;
@@ -238,13 +234,11 @@ body {
 
 .manual_input_cancel__Colorfy,
 .manual_input_add__Colorfy {
-  border: 3px solid midnightblue !important;
   padding: 5px !important;
-  border-radius: 5px !important;
   margin: 5px !important;
-  width: 35px !important;
   text-align: center !important;
   cursor: pointer !important;
+  display: flex !important;
 }
 
 .manual_input_add__Colorfy {
@@ -336,4 +330,21 @@ body {
   background-color: #333333 !important;
   border: 2px solid #444444 !important;
   color: #ffffff !important;
+}
+
+.Colorfy_dark-scheme .options_wrapper__Colorfy {
+  background: #444444 !important;
+}
+
+.Colorfy_dark-scheme .saved_element_input__Colorfy{
+  background: #333333 !important;
+}
+
+.Colorfy_dark-scheme .input_label__Colorfy{
+  color: #ffffff !important;
+}
+
+.Colorfy_dark-scheme .manual_input_elment__Colorfy{
+  background: #FFFFFF !important;
+  color: #000000 !important;
 }
