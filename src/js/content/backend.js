@@ -234,3 +234,10 @@ function clearColors() {
     }
   });
 }
+
+// Make functions globally accessible for other modules
+window.saveElement = saveElement;
+window.getSavedChanges = getSavedChanges;
+window.changeFormat = changeFormat;
+window.selectElements = selectElements;
+window.elementInfo = elementInfo;

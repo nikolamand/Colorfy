@@ -170,9 +170,12 @@ body {
   display: none;
   height: 400px !important;
   width: 100% !important;
-  background: white !important;
-  padding-top: 20px !important;
-  overflow: auto !important;
+  background: #f5f6f7 !important;
+  padding: 20px 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  box-sizing: border-box !important;
 }
 
 .close_options__Colorfy {
@@ -185,23 +188,123 @@ body {
 
 .saved_items_wrapper__Colorfy {
   display: flex !important;
-  flex-wrap: wrap !important;
-  width: 90% !important;
-  margin: 10px auto !important;
-  max-height: 100% !important;
+  flex-direction: column !important;
+  width: 95% !important;
+  margin: 0 auto !important;
+  padding: 10px !important;
+  gap: 15px !important;
+  box-sizing: border-box !important;
 }
 
 .saved_element_input__Colorfy {
-  width: calc(100% - 100px) !important;
-  margin: 10px !important;
-  height: 120px;
+  width: 100% !important;
+  margin: 0 !important;
+  height: 180px !important;
+  border: 2px solid #e1e5e9 !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  background: #f8f9fa !important;
+  color: #333 !important;
+  resize: vertical !important;
+  transition: all 0.2s ease !important;
+  box-sizing: border-box !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.saved_element_input__Colorfy:focus {
+  outline: none !important;
+  border-color: #007bff !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
 }
 
 .delete_saved_button__Colorfy {
-  padding: 5px !important;
-  background: none !important;
-  margin: 10px !important;
+  padding: 8px 12px !important;
+  background: #fff !important;
+  border: 2px solid #dc3545 !important;
+  border-radius: 8px !important;
+  color: #dc3545 !important;
   cursor: pointer !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 40px !important;
+  height: 40px !important;
+}
+
+.delete_saved_button__Colorfy:hover {
+  background: #dc3545 !important;
+  color: white !important;
+  transform: scale(1.05) !important;
+}
+
+.save_saved_button__Colorfy {
+  padding: 8px 12px !important;
+  background: #28a745 !important;
+  color: white !important;
+  border: 2px solid #28a745 !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 40px !important;
+  height: 40px !important;
+}
+
+.save_saved_button__Colorfy:hover {
+  background: #218838 !important;
+  border-color: #218838 !important;
+  transform: scale(1.05) !important;
+}
+
+.saved_items_header__Colorfy {
+  text-align: center !important;
+  margin: 20px 0 10px 0 !important;
+  color: #333 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  padding: 0 20px !important;
+}
+
+.saved_items_empty__Colorfy {
+  text-align: center !important;
+  color: #666 !important;
+  font-style: italic !important;
+  margin: 40px 0 !important;
+  padding: 20px !important;
+}
+
+.saved_element_wrapper__Colorfy {
+  background: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+  margin-bottom: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+}
+
+.saved_element_wrapper__Colorfy:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.saved_element_buttons__Colorfy {
+  display: flex !important;
+  gap: 10px !important;
+  margin-bottom: 15px !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
 }
 
 .manual_input_wrapper__Colorfy {

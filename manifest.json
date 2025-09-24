@@ -1,15 +1,15 @@
 {
   "name": "Colorfy",
   "description": "__MSG_description__",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Nikola Mandić",
   "manifest_version": 3,
   "default_locale": "en",
   "icons": {
-    "16": "logo_16.png",
-    "32": "logo_32.png",
-    "64": "logo_64.png",
-    "128": "logo_128.png"
+    "16": "assets/logos/logo_16.png",
+    "32": "assets/logos/logo_32.png",
+    "64": "assets/logos/logo_64.png",
+    "128": "assets/logos/logo_128.png"
   },
 
   "permissions": [
@@ -27,18 +27,23 @@
     {
       "resources": [
         "assets/*",
-        "colorfy.css"
+        "src/css/*"
       ],
       "matches": ["<all_urls>"]
     }
   ],
 
   "action": {
-    "default_icon": "logo.png"
+    "default_icon": {
+      "16": "assets/logos/logo_16.png",
+      "32": "assets/logos/logo_32.png",
+      "64": "assets/logos/logo_64.png",
+      "128": "assets/logos/logo_128.png"
+    }
   },
 
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/js/background/background.js"
   },
 
   "incognito": "spanning",
@@ -47,8 +52,17 @@
     {
       "matches": ["*://*/*", "file://*/*"],
       "all_frames": true,
-      "js": ["backend.js"],
-      "css": ["colorfy.css"]
+      "js": [
+        "src/lib/vanilla-picker.min.js",
+        "src/js/modules/colorUtils.js",
+        "src/js/modules/elementSelection.js", 
+        "src/js/modules/storage.js",
+        "src/js/modules/uiComponents.js",
+        "src/js/modules/paletteManager.js",
+        "src/js/content/backend.js",
+        "src/js/content/main.js"
+      ],
+      "css": ["src/css/colorfy.css"]
     }
   ],
 
