@@ -47,6 +47,76 @@
   ];
 
   /**
+   * Parse a color string and return RGB values and alpha
+   * @param {string} colorStr - The color string (hex, rgb, rgba, hsl, etc.)
+   * @returns {object} - Object with r, g, b, a values
+   */
+  const parseColor = (colorStr) => {
+    // Create a temporary element to use browser's color parsing
+    const div = document.createElement('div');
+    div.style.color = colorStr;
+    document.body.appendChild(div);
+    
+    // Get computed color (will be in rgb/rgba format)
+    const computedColor = window.getComputedStyle(div).color;
+    document.body.removeChild(div);
+    
+    // Parse rgb/rgba values
+    const rgbMatch = computedColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (rgbMatch) {
+      return {
+        r: parseInt(rgbMatch[1]),
+        g: parseInt(rgbMatch[2]),
+        b: parseInt(rgbMatch[3]),
+        a: rgbMatch[4] ? parseFloat(rgbMatch[4]) : 1
+      };
+    }
+    
+    // Fallback for hex colors
+    const hexMatch = colorStr.match(/^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/);
+    if (hexMatch) {
+      let hex = hexMatch[1];
+      if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+      }
+      return {
+        r: parseInt(hex.substr(0, 2), 16),
+        g: parseInt(hex.substr(2, 2), 16),
+        b: parseInt(hex.substr(4, 2), 16),
+        a: 1
+      };
+    }
+    
+    // Default fallback
+    return { r: 0, g: 0, b: 0, a: 1 };
+  };
+
+  /**
+   * Returns the optimal text color (black or white) based on background color brightness
+   * @param {string} backgroundColor - The background color string
+   * @returns {string} - Either 'black' or 'white'
+   */
+  const getOptimalTextColor = (backgroundColor) => {
+    try {
+      const { r, g, b, a } = parseColor(backgroundColor);
+      
+      // Mix the color with white based on its alpha value (for transparency)
+      const mixedR = r * a + 255 * (1 - a);
+      const mixedG = g * a + 255 * (1 - a);
+      const mixedB = b * a + 255 * (1 - a);
+      
+      // Calculate brightness using the standard formula
+      const brightness = (mixedR * 299 + mixedG * 587 + mixedB * 114) / 1000;
+      
+      // Return black for light backgrounds, white for dark backgrounds
+      return brightness > 155 ? 'black' : 'white';
+    } catch (e) {
+      console.warn('Could not parse color:', backgroundColor, e);
+      return 'black'; // Default to black if color parsing fails
+    }
+  };
+
+  /**
    * Initialize the script: load CSS, add event listeners in a "selection mode".
    */
   const init = () => {
@@ -597,26 +667,33 @@
     input.name = `paletteColors-${paletteName}`;
     input.id = `customColor-${paletteName}`;
     input.type = "radio";
-    input.value = "FFF";
-
-    const colorBox = document.createElement("p");
-    colorBox.className = "colorfy_color__Colorfy colorfy_custom_color__Colorfy";
-    colorBox.id = `colorfy_color-${paletteName}`;
-    colorBox.innerHTML = chrome.i18n.getMessage("customColor");
-    colorBox.style.backgroundColor = "#FFF";
+    input.value = "#FFFFFF";
 
     // If the selected element has a current color, set it
-    let currentColor = "#FFFF";
+    let currentColor = "#FFFFFF";
 
     if (selectedElement?.target) {
       const hexBackground = rgbToHex(selectedElement.target.style.background);
       const hexColor = rgbToHex(selectedElement.target.style.color);
       if (paletteName === "background") {
-        currentColor = hexBackground || "#FFFF";
+        currentColor = hexBackground || "#FFFFFF";
       } else if (paletteName === "text") {
-        currentColor = hexColor || "#FFFF";
+        currentColor = hexColor || "#000000";
       }
     }
+
+    // Update input value with current color
+    input.value = currentColor;
+
+    const colorBox = document.createElement("p");
+    colorBox.className = "colorfy_color__Colorfy colorfy_custom_color__Colorfy";
+    colorBox.id = `colorfy_color-${paletteName}`;
+    colorBox.innerHTML = chrome.i18n.getMessage("customColor");
+    colorBox.style.backgroundColor = currentColor;
+
+    // Set initial text color based on background
+    const initialTextColor = getOptimalTextColor(currentColor);
+    colorBox.style.setProperty('color', initialTextColor, 'important');
 
     // If "Picker" is available (VanillaPicker)
     if (typeof Picker !== "undefined") {
@@ -627,10 +704,38 @@
         onChange: (color) => {
           colorBox.style.background = color.rgbaString;
           input.value = color.rgbaString;
+          input.checked = true; // Automatically select this radio button when color changes
+          
+          // Update text color based on the new background color
+          const optimalTextColor = getOptimalTextColor(color.rgbaString);
+          colorBox.style.setProperty('color', optimalTextColor, 'important');
         },
       });
     } else {
       console.log("Undefined Picker - ensure VanillaPicker is loaded.");
+      // Fallback: create a regular color input
+      const colorInput = document.createElement("input");
+      colorInput.type = "color";
+      colorInput.value = currentColor.length === 7 ? currentColor : "#FFFFFF";
+      colorInput.style.width = "50px";
+      colorInput.style.height = "30px";
+      colorInput.style.border = "none";
+      colorInput.style.borderRadius = "5px";
+      colorInput.style.cursor = "pointer";
+      colorInput.style.marginLeft = "10px";
+      
+      colorInput.addEventListener("change", (e) => {
+        const selectedColor = e.target.value;
+        colorBox.style.background = selectedColor;
+        input.value = selectedColor;
+        input.checked = true; // Automatically select this radio button when color changes
+        
+        // Update text color based on the new background color
+        const optimalTextColor = getOptimalTextColor(selectedColor);
+        colorBox.style.setProperty('color', optimalTextColor, 'important');
+      });
+      
+      colorBox.appendChild(colorInput);
     }
 
     label.appendChild(input);

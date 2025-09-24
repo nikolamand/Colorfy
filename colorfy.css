@@ -279,8 +279,6 @@ body {
   align-items: center !important;
   color: black !important;
   font-family: Arial !important;
-  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
-    1px 1px 0 #fff;
 }
 
 .colorfy_default_color__Colorfy {
