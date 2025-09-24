@@ -1,7 +1,7 @@
 {
   "name": "Colorfy",
   "description": "__MSG_description__",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "author": "Nikola Mandić",
   "manifest_version": 3,
   "default_locale": "en",
@@ -27,7 +27,8 @@
     {
       "resources": [
         "assets/*",
-        "src/css/*"
+        "src/css/*",
+        "src/js/modules/*"
       ],
       "matches": ["<all_urls>"]
     }
@@ -57,6 +58,8 @@
         "src/js/modules/colorUtils.js",
         "src/js/modules/elementSelection.js", 
         "src/js/modules/storage.js",
+        "src/js/modules/styleManager.js",
+        "src/js/modules/styleSelector.js",
         "src/js/modules/uiComponents.js",
         "src/js/modules/paletteManager.js",
         "src/js/content/backend.js",

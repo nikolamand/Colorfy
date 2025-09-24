@@ -261,18 +261,85 @@ const saveStorageElement = (el) => {
 
 /**
  * Reset all Colorfy-applied styles on the page
+ * This function will reset ALL elements that have been modified by ANY style
  */
 const resetColorfyStyles = () => {
-  // Find all elements that have Colorfy-applied styles
-  const allElements = document.querySelectorAll('*:not([class*="__Colorfy"])');
+  // Get all styles for current URL to find all elements that might have been modified
+  const currentUrl = window.getBaseURL ? window.getBaseURL() : window.location.origin;
   
-  allElements.forEach(el => {
-    // Check if element has any inline styles that might be from Colorfy
-    if (el.style.cssText) {
-      // Remove background and color properties that were set with !important
-      el.style.removeProperty('background');
-      el.style.removeProperty('background-color');
-      el.style.removeProperty('color');
+  chrome.storage.local.get(["Colorfy_Styles"], (data) => {
+    let elementsToReset = [];
+    
+    if (data.Colorfy_Styles) {
+      try {
+        const stylesData = JSON.parse(data.Colorfy_Styles);
+        
+        if (stylesData[currentUrl] && stylesData[currentUrl].styles) {
+          // Collect all elements from all styles
+          stylesData[currentUrl].styles.forEach(style => {
+            if (style.elements && Array.isArray(style.elements)) {
+              elementsToReset = elementsToReset.concat(style.elements);
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Error parsing styles data for reset:', e);
+      }
+    }
+    
+    // Also check legacy storage
+    chrome.storage.local.get(["Colorfy"], (legacyData) => {
+      if (legacyData.Colorfy) {
+        try {
+          const legacyElements = JSON.parse(legacyData.Colorfy);
+          const legacyUrlData = Object.values(legacyElements).find(item => item.url === currentUrl);
+          if (legacyUrlData && legacyUrlData.elements) {
+            elementsToReset = elementsToReset.concat(legacyUrlData.elements);
+          }
+        } catch (e) {
+          console.error('Error parsing legacy data for reset:', e);
+        }
+      }
+      
+      // Now reset all collected elements
+      resetSpecificElements(elementsToReset);
+    });
+  });
+};
+
+/**
+ * Reset specific elements using the same selection logic as getSavedChanges
+ */
+const resetSpecificElements = (elements) => {
+  if (!elements || !Array.isArray(elements)) return;
+  
+  elements.forEach(elementData => {
+    try {
+      // Use the same selectElements function that getSavedChanges uses
+      const selectedElements = window.selectElements ? window.selectElements(elementData) : [];
+      
+      selectedElements.forEach(el => {
+        try {
+          // Reset the main element using the function from styleManager
+          if (window.resetElementStyles) {
+            window.resetElementStyles(el);
+          }
+          
+          // Also reset all nested children (since getSavedChanges applies to children too)
+          const family = el.getElementsByTagName("*");
+          for (let i = 0; i < family.length; i++) {
+            if (!family[i].className || !family[i].className.includes("__Colorfy")) {
+              if (window.resetElementStyles) {
+                window.resetElementStyles(family[i]);
+              }
+            }
+          }
+        } catch (err) {
+          // Silently ignore individual element errors
+        }
+      });
+    } catch (err) {
+      // Silently ignore if we can't select some elements
     }
   });
 };

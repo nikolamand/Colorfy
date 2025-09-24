@@ -13,7 +13,9 @@ Colorfy/
 │   │   │   ├── elementSelection.js  # Element interaction & selection
 │   │   │   ├── storage.js          # Data persistence & saved elements
 │   │   │   ├── uiComponents.js     # UI creation & management
-│   │   │   └── paletteManager.js   # Color palette management
+│   │   │   ├── paletteManager.js   # Color palette management
+│   │   │   ├── styleManager.js     # Multi-style functionality (NEW)
+│   │   │   └── styleSelector.js    # Style selection UI (NEW)
 │   │   ├── content/                # Content scripts
 │   │   │   ├── backend.js          # Original backend functionality
 │   │   │   └── main.js             # Main coordinator & entry point

@@ -68,7 +68,7 @@ const addPresetColors = (colors, paletteName, collapse = false) => {
     input.type = "radio";
     input.value = colors[i];
 
-    const selectedColors = getSelectedColors();
+    const selectedColors = window.getSelectedColors ? window.getSelectedColors() : { background: null, text: null };
     if (colors[i] === selectedColors.background && paletteName === "background") {
       input.checked = true;
     }
@@ -163,10 +163,10 @@ const addCustomColor = (paletteName) => {
   // If the selected element has a current color, set it
   let currentColor = "#FFFFFF";
 
-  const selectedElement = getSelectedElement();
+  const selectedElement = window.getSelectedElement ? window.getSelectedElement() : null;
   if (selectedElement?.target) {
-    const hexBackground = rgbToHex(selectedElement.target.style.background);
-    const hexColor = rgbToHex(selectedElement.target.style.color);
+    const hexBackground = window.rgbToHex ? window.rgbToHex(selectedElement.target.style.background) : null;
+    const hexColor = window.rgbToHex ? window.rgbToHex(selectedElement.target.style.color) : null;
     if (paletteName === "background") {
       currentColor = hexBackground || "#FFFFFF";
     } else if (paletteName === "text") {
@@ -184,7 +184,7 @@ const addCustomColor = (paletteName) => {
   colorBox.style.backgroundColor = currentColor;
 
   // Set initial text color based on background
-  const initialTextColor = getOptimalTextColor(currentColor);
+  const initialTextColor = window.getOptimalTextColor ? window.getOptimalTextColor(currentColor) : "#000000";
   colorBox.style.setProperty('color', initialTextColor, 'important');
 
   // If "Picker" is available (VanillaPicker)
@@ -204,7 +204,6 @@ const addCustomColor = (paletteName) => {
       },
     });
   } else {
-    console.log("Undefined Picker - ensure VanillaPicker is loaded.");
     // Fallback: create a regular color input
     const colorInput = document.createElement("input");
     colorInput.type = "color";
@@ -241,6 +240,11 @@ const addCustomColor = (paletteName) => {
  */
 const addColors = (paletteName) => {
   const { colorsWrapper } = getUIReferences();
+  
+  if (!colorsWrapper) {
+    return;
+  }
+  
   const palette = document.createElement("div");
   palette.className = `palette__Colorfy palette-${paletteName}`;
   colorsWrapper.appendChild(palette);
@@ -257,14 +261,16 @@ const addColors = (paletteName) => {
   addDefaultColor(paletteName);
 
   // Preset colors
-  addPresetColors(colorfyColors, paletteName);
+  if (window.colorfyColors) {
+    addPresetColors(window.colorfyColors, paletteName);
+  }
 
   // Custom color picker
   addCustomColor(paletteName);
 
   // If background, also add collapsible gradients
-  if (paletteName === "background" && useGradients) {
-    addPresetColors(colorfyGradients, paletteName, true);
+  if (paletteName === "background" && useGradients && window.colorfyGradients) {
+    addPresetColors(window.colorfyGradients, paletteName, true);
     colapsePreviousElement(paletteName, "Gradient colors");
   }
 };
@@ -283,14 +289,22 @@ const addColorPicker = () => {
  * Gather the chosen colors from the radio inputs, apply, then save
  */
 const selectedChanges = () => {
+  // Check if current style allows editing
+  if (!window.canEditCurrentStyle()) {
+    alert("Cannot apply changes to the Original style. Please select a different style to make changes.");
+    return;
+  }
+
   // Background
   const backgroundInputs = document.getElementsByName(
     "paletteColors-background"
   );
   for (let i = 0; i < backgroundInputs.length; i++) {
     if (backgroundInputs[i].checked) {
-      const selectedColors = getSelectedColors();
-      setSelectedColors(backgroundInputs[i].value, selectedColors.text);
+      const selectedColors = window.getSelectedColors ? window.getSelectedColors() : { background: null, text: null };
+      if (window.setSelectedColors) {
+        window.setSelectedColors(backgroundInputs[i].value, selectedColors.text);
+      }
       break;
     }
   }
@@ -299,24 +313,45 @@ const selectedChanges = () => {
   const textInputs = document.getElementsByName("paletteColors-text");
   for (let i = 0; i < textInputs.length; i++) {
     if (textInputs[i].checked) {
-      const selectedColors = getSelectedColors();
-      setSelectedColors(selectedColors.background, textInputs[i].value);
+      const selectedColors = window.getSelectedColors ? window.getSelectedColors() : { background: null, text: null };
+      if (window.setSelectedColors) {
+        window.setSelectedColors(selectedColors.background, textInputs[i].value);
+      }
       break;
     }
   }
 
   // Apply to the previously selected element
-  const selectedElement = getSelectedElement();
-  const targetEls = selectElements(selectedElement);
-  for (let index = 0; index < targetEls.length; index++) {
-    changeColor(targetEls[index]);
+  const selectedElement = window.getSelectedElement ? window.getSelectedElement() : null;
+  if (selectedElement) {
+    const targetEls = window.selectElements ? window.selectElements(selectedElement) : [selectedElement.target];
+    for (let index = 0; index < targetEls.length; index++) {
+      if (window.changeColor) {
+        window.changeColor(targetEls[index]);
+      }
+    }
+
+    // Save to the current style instead of legacy storage
+    if (window.saveElementToCurrentStyle) {
+      const elementInfoData = window.elementInfo ? window.elementInfo(selectedElement) : {};
+      window.saveElementToCurrentStyle(elementInfoData, () => {
+        // Update the style selector to reflect changes
+        if (window.populateStyleSelector) {
+          window.populateStyleSelector();
+        }
+      });
+    } else {
+      // Fallback to legacy system
+      if (window.saveElement && window.elementInfo) {
+        window.saveElement(window.elementInfo(selectedElement));
+      }
+    }
   }
 
-  // Save to storage
-  saveElement(elementInfo(selectedElement));
-
   // Done
-  closeColorfy();
+  if (window.closeColorfy) {
+    window.closeColorfy();
+  }
 };
 
 /**

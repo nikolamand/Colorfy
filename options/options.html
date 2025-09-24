@@ -7,42 +7,158 @@
   </head>
   <body>
     <div class="options-container">
-      <h1>Colorfy Options</h1>
-      <div class="option">
-        <label for="color-scheme">Color Scheme:</label>
+      <!-- Header Section -->
+      <div class="header-section">
+        <h1>Colorfy Settings</h1>
+        <p class="subtitle">Customize your color picking experience</p>
+      </div>
 
-        <div class="option-control">
-          <select id="color-scheme">
-            <option value="system">System Default</option>
-            <option value="dark">Dark Mode</option>
-            <option value="light">Light Mode</option>
-          </select>
+      <!-- General Settings -->
+      <div class="settings-section">
+        <h2 class="section-title">General Settings</h2>
+        <p class="section-description">Configure basic appearance and behavior preferences</p>
+        
+        <div class="option">
+          <div class="option-info">
+            <label for="color-scheme">Color Scheme</label>
+            <div class="option-description">Choose how Colorfy appears in your browser</div>
+          </div>
+          <div class="option-control">
+            <select id="color-scheme">
+              <option value="system">System Default</option>
+              <option value="dark">Dark Mode</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="option-info">
+            <label for="use-gradients">Enable Gradient Colors</label>
+            <div class="option-description">Allow gradient color combinations in the color picker</div>
+          </div>
+          <div class="option-control">
+            <input type="checkbox" id="use-gradients" checked />
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="option-info">
+            <label for="dev-mode">Developer Mode</label>
+            <div class="option-description">Show advanced options and debugging features</div>
+          </div>
+          <div class="option-control">
+            <input type="checkbox" id="dev-mode" />
+            <small>Enables saved items management</small>
+          </div>
         </div>
       </div>
-      <div class="option">
-        <label for="use-gradients">Enable Gradient Colors:</label>
-        <div class="option-control">
-          <input type="checkbox" id="use-gradients" checked />
+
+      <!-- Storage Management -->
+      <div class="settings-section">
+        <h2 class="section-title">Storage Management</h2>
+        <p class="section-description">Monitor and manage your saved colors and extension data</p>
+        
+        <div class="option">
+          <div class="option-info">
+            <label for="storage-usage">Storage Usage</label>
+            <div class="option-description">Current usage of Chrome's local storage quota</div>
+          </div>
+          <div class="option-control">
+            <div id="storage-info">
+              <div id="storage-bar-container">
+                <div id="storage-bar">
+                  <div id="storage-fill"></div>
+                </div>
+                <span id="storage-text">Loading...</span>
+              </div>
+              <div id="storage-details">
+                <small id="storage-stats">Calculating storage usage...</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="option-info">
+            <label for="manage-storage">Manage Saved Colors</label>
+            <div class="option-description">View and selectively delete saved colors by website</div>
+          </div>
+          <div class="option-control">
+            <button id="manage-storage-btn" type="button">Manage Storage</button>
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="option-info">
+            <label for="clear-data">Reset All Data</label>
+            <div class="option-description">Completely reset the extension to factory defaults</div>
+          </div>
+          <div class="option-control">
+            <button id="clear_all_changes">Clear All Data</button>
+            <small>⚠️ This cannot be undone</small>
+          </div>
         </div>
       </div>
-      <div class="option">
-        <label for="dev-mode">Developer Mode:</label>
-        <div class="option-control">
-          <input type="checkbox" id="dev-mode" />
-          <small>Show advanced saved items button</small>
+
+      <!-- Actions Section -->
+      <div class="actions-section">
+        <h2 class="section-title">Save Changes</h2>
+        <p class="section-description">Apply your settings changes or restore defaults</p>
+        <div class="buttons">
+          <button id="save-settings">Save Settings</button>
+          <button id="reset-settings">Reset to Default</button>
         </div>
-      </div>
-      <div class="option">
-        <label for="clear-data">Clear Data:</label>
-        <div class="option-control">
-          <button id="clear_all_changes">Clear Data</button>
-        </div>
-      </div>
-      <div class="buttons">
-        <button id="save-settings">Save Settings</button>
-        <button id="reset-settings">Reset to Default</button>
       </div>
     </div>
+
+    <!-- Storage Management Modal -->
+    <div id="storage-modal" class="modal-overlay" style="display: none;">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Manage Saved Colors</h2>
+          <button id="storage-modal-close" class="close-btn" type="button">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Current Usage Overview -->
+          <div class="storage-overview">
+            <h3>Storage Usage</h3>
+            <div class="usage-display">
+              <div class="usage-bar">
+                <div id="modal-storage-fill" class="usage-fill"></div>
+              </div>
+              <div class="usage-text">
+                <span id="modal-storage-text">Loading...</span>
+                <span id="modal-storage-details">Calculating usage...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Categories -->
+          <div class="storage-categories">
+            <h3>Saved Colors by Website</h3>
+            
+            <div class="category-controls">
+              <button id="select-all-btn" type="button">Select All</button>
+              <button id="select-none-btn" type="button">Select None</button>
+            </div>
+
+            <div id="categories-list" class="categories-container">
+              <!-- Websites will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-buttons">
+            <button id="storage-modal-cancel" class="secondary-btn" type="button">Cancel</button>
+            <button id="storage-modal-apply" class="danger-btn" type="button" disabled>Delete Selected</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="options.js"></script>
   </body>
 </html>

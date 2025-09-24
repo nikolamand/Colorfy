@@ -2,10 +2,43 @@
 let storedData = [];
 // Array with DOM elements for the given URL
 let storedColors = [];
+// Track pending timeouts to cancel them when switching styles
+let pendingTimeouts = [];
 
 /**
- * Get base URL for current tab
+ * Clear any pending style application timeouts
  */
+function clearPendingTimeouts() {
+  pendingTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+  pendingTimeouts = [];
+}
+
+/**
+ * Apply styles with retry timeouts for slow-loading pages
+ */
+function applyStylesWithRetry(elements, reason = "unknown") {
+  if (!elements || elements.length === 0) {
+    return;
+  }
+  
+  // Apply immediately
+  getSavedChanges(elements);
+  
+  // Set up retry timeouts and track them
+  const timeoutDelays = [1000, 2000, 3000, 5000];
+  timeoutDelays.forEach(delay => {
+    const timeoutId = setTimeout(() => {
+      getSavedChanges(elements);
+      // Remove this timeout from pending list
+      const index = pendingTimeouts.indexOf(timeoutId);
+      if (index > -1) {
+        pendingTimeouts.splice(index, 1);
+      }
+    }, delay);
+    
+    pendingTimeouts.push(timeoutId);
+  });
+}
 function getBaseURL() {
   const { protocol, host } = window.location;
   return `${protocol}//${host}`;
@@ -15,6 +48,56 @@ function getBaseURL() {
  * Fetch from storage, then apply changes for the current page
  */
 function getData() {
+  // Clear any pending timeouts from previous style applications
+  clearPendingTimeouts();
+  
+  // First, check for new style-based storage
+  chrome.storage.local.get(["Colorfy_Styles"], (styleData) => {
+    if (styleData["Colorfy_Styles"]) {
+      try {
+        const stylesData = JSON.parse(styleData["Colorfy_Styles"]);
+        const currentBase = getBaseURL();
+        
+        if (stylesData[currentBase] && stylesData[currentBase].styles) {
+          const activeStyleId = stylesData[currentBase].activeStyle;
+          const activeStyle = stylesData[currentBase].styles.find(s => s.id === activeStyleId);
+          
+          if (activeStyle && !activeStyle.isOriginal) {
+            storedColors = activeStyle.elements;
+            // Notify background to update the badge
+            chrome.runtime.sendMessage({
+              type: "updateBadge",
+              text: storedColors.length.toString()
+            });
+
+            // Apply the changes with retry timeouts for slow-loading pages
+            applyStylesWithRetry(storedColors, `style: ${activeStyleId}`);
+          } else {
+            // Original style selected - clear badge and no styles to apply
+            chrome.runtime.sendMessage({
+              type: "updateBadge",
+              text: ""
+            });
+          }
+        } else {
+          // No styles data for this URL, check legacy storage
+          checkLegacyStorage();
+        }
+      } catch (e) {
+        console.error('Error parsing styles data:', e);
+        checkLegacyStorage();
+      }
+    } else {
+      // No new style storage, check legacy
+      checkLegacyStorage();
+    }
+  });
+}
+
+/**
+ * Check legacy storage for backward compatibility
+ */
+function checkLegacyStorage() {
   chrome.storage.local.get(["Colorfy"], (data) => {
     if (data["Colorfy"]) {
       storedData = changeFormat(data["Colorfy"]);
@@ -28,12 +111,8 @@ function getData() {
             text: storedColors.length.toString()
           });
 
-          // Apply the changes multiple times to ensure the DOM is ready
-          getSavedChanges(storedColors);
-          setTimeout(() => getSavedChanges(storedColors), 1000);
-          setTimeout(() => getSavedChanges(storedColors), 2000);
-          setTimeout(() => getSavedChanges(storedColors), 3000);
-          setTimeout(() => getSavedChanges(storedColors), 5000);
+          // Apply the changes with retry timeouts for slow-loading pages
+          applyStylesWithRetry(storedColors, "legacy storage");
         }
       }
     }
@@ -175,17 +254,22 @@ function selectElements(e) {
 
   if (element.id) {
     const found = document.getElementById(element.id);
-    if (found) elArr.push(found);
+    if (found) {
+      elArr.push(found);
+    }
   } else if (element.className) {
-    elArr = document.getElementsByClassName(element.className);
+    elArr = Array.from(document.getElementsByClassName(element.className));
   } else if (element.nodeName) {
     const tmp = document.getElementsByTagName(element.nodeName);
+    
     for (let i = 0; i < tmp.length; i++) {
-      if (checkParents(element.parentNode, parentInfo(tmp[i]))) {
+      const parentMatch = checkParents(element.parentNode, parentInfo(tmp[i]));
+      if (parentMatch) {
         elArr.push(tmp[i]);
       }
     }
   }
+  
   return elArr;
 }
 
@@ -193,31 +277,61 @@ function selectElements(e) {
  * Apply color/background changes for a list of stored color definitions
  */
 function getSavedChanges(data) {
-  if (!data) return;
+  if (!data) {
+    return;
+  }
+
+  let appliedCount = 0;
 
   for (let i = 0; i < data.length; i++) {
     const selectedElements = selectElements(data[i]);
+    
+    if (selectedElements.length === 0) {
+      continue;
+    }
+    
     const selectedBackground = data[i].background;
     const selectedBackgroundColor = data[i].backgroundColor;
     const selectedTextColor = data[i].color;
 
     for (let j = 0; j < selectedElements.length; j++) {
+      const el = selectedElements[j];
+      
       try {
-        const el = selectedElements[j];
-        el.style.setProperty("background", selectedBackgroundColor, "important");
-        el.style.setProperty("background", selectedBackground, "important");
-        el.style.setProperty("color", "none", "important");
-        el.style.setProperty("color", selectedTextColor, "important");
-
-        // Also change text color of all nested children
-        const family = el.getElementsByTagName("*");
-        for (let k = 0; k < family.length; k++) {
-          if (family[k].className.includes("__Colorfy")) continue;
-          family[k].style.setProperty("color", "none", "important");
-          family[k].style.setProperty("color", selectedTextColor, "important");
+        let stylesApplied = [];
+        
+        // Apply background styles
+        if (selectedBackground && selectedBackground !== 'none') {
+          el.style.setProperty("background", selectedBackground, "important");
+          stylesApplied.push(`bg:${selectedBackground}`);
+        }
+        if (selectedBackgroundColor && selectedBackgroundColor !== 'none') {
+          el.style.setProperty("background-color", selectedBackgroundColor, "important");
+          stylesApplied.push(`bg-color:${selectedBackgroundColor}`);
+        }
+        
+        // Apply text color
+        if (selectedTextColor && selectedTextColor !== 'none') {
+          el.style.setProperty("color", selectedTextColor, "important");
+          stylesApplied.push(`color:${selectedTextColor}`);
+          
+          // Also change text color of all nested children
+          const family = el.getElementsByTagName("*");
+          for (let k = 0; k < family.length; k++) {
+            // Check if element has className and if it's a string that includes "__Colorfy"
+            const elementClassName = family[k].className;
+            if (elementClassName && typeof elementClassName === 'string' && elementClassName.includes("__Colorfy")) continue;
+            if (elementClassName && typeof elementClassName !== 'string' && elementClassName.toString().includes("__Colorfy")) continue;
+            
+            family[k].style.setProperty("color", selectedTextColor, "important");
+          }
+        }
+        
+        if (stylesApplied.length > 0) {
+          appliedCount++;
         }
       } catch (err) {
-        // Silently ignore if we can't change some element
+        console.error('❌ Error applying styles:', err);
       }
     }
   }

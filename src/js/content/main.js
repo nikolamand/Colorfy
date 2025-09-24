@@ -4,10 +4,30 @@
  */
 
 (function () {
+  // Initialize storage versioning first
+  const initStorageVersioning = () => {
+    // Only initialize if not already done
+    if (!window.COLORFY_STORAGE_INITIALIZED) {
+      const script = document.createElement('script');
+      script.src = chrome.runtime.getURL('src/js/modules/storageVersioning.js');
+      document.head.appendChild(script);
+      
+      script.onload = () => {
+        if (window.initializeStorageVersioning) {
+          window.initializeStorageVersioning();
+        }
+      };
+    } else {
+      // Storage versioning already initialized
+    }
+  };
+
   /**
    * Initialize the script: load CSS, add event listeners in a "selection mode"
    */
   const init = () => {
+    // Initialize storage versioning first
+    initStorageVersioning();
     // CSS is already loaded via manifest.json content_scripts
     // No need to load it again here
 
@@ -23,6 +43,19 @@
 
     // Apply gradient preferences from storage
     applyGradientOption();
+
+    // Initialize the style management system
+    if (window.initializeStyles) {
+      window.initializeStyles(() => {
+        // Apply the current active style on page load
+        const currentStyle = window.getCurrentStyle();
+        if (currentStyle && !currentStyle.isOriginal && currentStyle.elements.length > 0) {
+          if (window.getSavedChanges) {
+            window.getSavedChanges(currentStyle.elements);
+          }
+        }
+      });
+    }
 
     // Just initialize but don't start selection mode automatically
     // Selection mode should only start when user clicks extension icon

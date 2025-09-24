@@ -3,10 +3,31 @@
  * We cannot directly use alerts/confirms here — they simply won't work.
  * We also replace chrome.browserAction with chrome.action.
  */
+
+// Initialize storage versioning when service worker starts
+chrome.runtime.onStartup.addListener(() => {
+  initializeStorage();
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  initializeStorage();
+});
+
+// Initialize storage versioning
+async function initializeStorage() {
+  try {
+    // Import storage versioning module
+    importScripts('storageVersioning.js');
+    
+    // Note: Since we can't import ES modules in service workers easily,
+    // we'll handle versioning in content scripts instead
+  } catch (error) {
+    // Storage versioning will be handled by content scripts
+  }
+}
 chrome.action.onClicked.addListener((tab) => {
   // Check if the tab URL is valid for script injection
   if (!isValidUrl(tab.url)) {
-    console.log('Cannot run Colorfy on this page:', tab.url);
     return;
   }
 
@@ -14,7 +35,6 @@ chrome.action.onClicked.addListener((tab) => {
   // Just send a message to activate the extension UI
   chrome.tabs.sendMessage(tab.id, { type: 'showColorPicker' }, (response) => {
     if (chrome.runtime.lastError) {
-      console.log('Content script not ready yet, trying script injection...');
       // Fallback: inject scripts if content scripts haven't loaded
       chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -29,7 +49,7 @@ chrome.action.onClicked.addListener((tab) => {
           "src/js/content/main.js"
         ]
       }).catch((error) => {
-        console.log('Failed to inject scripts:', error);
+        // Script injection failed, extension may not work on this page
       });
     }
   });
@@ -123,7 +143,6 @@ function clearColorsForActiveTab() {
     
     // Check if URL is valid
     if (!isValidUrl(url)) {
-      console.log('Cannot clear colors for this page:', url);
       return;
     }
     
@@ -140,7 +159,7 @@ function clearColorsForActiveTab() {
           chrome.storage.local.set({ Colorfy: JSON.stringify(storedData) }, () => {
             // Reload after clearing (only if it's a valid URL)
             chrome.tabs.reload(tab.id).catch((error) => {
-              console.log('Could not reload tab:', error);
+              // Could not reload tab, but clearing was successful
             });
           });
         }

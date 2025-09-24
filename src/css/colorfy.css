@@ -140,7 +140,7 @@ body {
   padding: 11px 23px !important;
   text-decoration: none !important;
   text-shadow: 0px -1px 0px #2b665e !important;
-  height: 40px !important;
+  height: 42px !important;
   order: 5 !important;
   margin: 10px calc(50% - 40px) 10px calc(50% - 40px) !important;
 }
@@ -164,6 +164,9 @@ body {
   cursor: pointer !important;
   color: black !important;
   margin-left: 97% !important;
+  position: absolute;
+  right: 32px;
+  bottom: 22px;
 }
 
 .options_wrapper__Colorfy {
@@ -203,7 +206,7 @@ body {
   border: 2px solid #e1e5e9 !important;
   border-radius: 8px !important;
   padding: 15px !important;
-  font-family: 'Courier New', monospace !important;
+  font-family: "Courier New", monospace !important;
   font-size: 13px !important;
   line-height: 1.4 !important;
   background: #f8f9fa !important;
@@ -437,15 +440,399 @@ body {
   background: #444444 !important;
 }
 
-.Colorfy_dark-scheme .saved_element_input__Colorfy{
-  background: #333333 !important;
+.Colorfy_dark-scheme .saved_element_wrapper__Colorfy {
+  background: #555555 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
-.Colorfy_dark-scheme .input_label__Colorfy{
+.Colorfy_dark-scheme .saved_items_header__Colorfy {
   color: #ffffff !important;
 }
 
-.Colorfy_dark-scheme .manual_input_elment__Colorfy{
-  background: #FFFFFF !important;
+.Colorfy_dark-scheme .saved_items_empty__Colorfy {
+  color: #cccccc !important;
+}
+
+.Colorfy_dark-scheme .saved_element_input__Colorfy {
+  background: #333333 !important;
+  color: #ffffff !important;
+  border-color: #666666 !important;
+}
+
+.Colorfy_dark-scheme .saved_element_input__Colorfy:focus {
+  background: #444444 !important;
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2) !important;
+}
+
+.Colorfy_dark-scheme .input_label__Colorfy {
+  color: #ffffff !important;
+}
+
+.Colorfy_dark-scheme .manual_input_elment__Colorfy {
+  background: #ffffff !important;
   color: #000000 !important;
+}
+
+/* STYLE SELECTOR STYLES */
+.style_selector_wrapper__Colorfy {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin-bottom: 15px !important;
+  padding: 10px !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+.style_selector_top_row__Colorfy {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.style_select__Colorfy {
+  flex: 1 !important;
+  padding: 8px 12px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  background-color: white !important;
+  color: #333 !important;
+  cursor: pointer !important;
+}
+
+.style_select__Colorfy:focus {
+  outline: none !important;
+  border-color: #007cba !important;
+  box-shadow: 0 0 3px rgba(0, 124, 186, 0.3) !important;
+}
+
+.style_edit_btn__Colorfy {
+  padding: 8px 15px !important;
+  background-color: #007cba !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.style_edit_btn__Colorfy:hover {
+  background-color: #005a87 !important;
+}
+
+.style_help_message__Colorfy {
+  font-size: 12px !important;
+  color: #856404 !important;
+  padding: 8px 12px !important;
+  background-color: #fff3cd !important;
+  border-radius: 4px !important;
+  border-left: 3px solid #ffc107 !important;
+  display: flex;
+  align-items: center !important;
+  gap: 5px !important;
+  margin-top: 0px !important;
+}
+
+/* STYLE EDIT MODAL STYLES */
+.style_edit_modal__Colorfy {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 10001000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.style_edit_content__Colorfy {
+  background-color: white !important;
+  border-radius: 10px !important;
+  padding: 20px !important;
+  width: 90% !important;
+  max-width: 500px !important;
+  max-height: 80vh !important;
+  overflow-y: auto !important;
+  position: relative !important;
+  color: #333 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.style_edit_close__Colorfy {
+  position: absolute !important;
+  top: 15px !important;
+  right: 20px !important;
+  font-size: 30px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  color: #aaa !important;
+  line-height: 1 !important;
+}
+
+.style_edit_close__Colorfy:hover {
+  color: #000 !important;
+}
+
+.style_edit_title__Colorfy {
+  margin: 0 0 20px 0 !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+  color: #333 !important;
+  padding-right: 40px !important;
+}
+
+.styles_list__Colorfy {
+  margin-bottom: 20px !important;
+}
+
+.style_item__Colorfy {
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px !important;
+  margin-bottom: 8px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 5px !important;
+  background-color: #f9f9f9 !important;
+  gap: 10px !important;
+}
+
+.style_item__Colorfy.active {
+  background-color: #e3f2fd !important;
+  border-color: #007cba !important;
+}
+
+.style_name__Colorfy {
+  font-weight: bold !important;
+  color: #333 !important;
+  flex: 1 !important;
+}
+
+.style_name__Colorfy.readonly {
+  color: #666 !important;
+  font-style: italic !important;
+}
+
+.style_name_input__Colorfy {
+  flex: 1 !important;
+  padding: 4px 8px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 3px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.style_name_input__Colorfy:focus {
+  outline: none !important;
+  border-color: #007cba !important;
+}
+
+.element_count__Colorfy {
+  color: #666 !important;
+  font-size: 12px !important;
+  margin-left: 10px !important;
+}
+
+.style_delete_btn__Colorfy {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 3px !important;
+  width: 25px !important;
+  height: 25px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.style_delete_btn__Colorfy:hover {
+  background-color: #c82333 !important;
+}
+
+.style_clone_btn__Colorfy {
+  background-color: #17a2b8 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 3px !important;
+  width: 25px !important;
+  height: 25px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.3s ease !important;
+  margin-left: 5px !important;
+}
+
+.style_clone_btn__Colorfy:hover {
+  background-color: #138496 !important;
+}
+
+.add_new_style__Colorfy {
+  padding: 15px !important;
+  border: 2px dashed #ddd !important;
+  border-radius: 5px !important;
+  text-align: center !important;
+}
+
+.add_style_btn__Colorfy {
+  background-color: #28a745 !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.add_style_btn__Colorfy:hover {
+  background-color: #218838 !important;
+}
+
+.max_styles_message__Colorfy {
+  color: #666 !important;
+  font-style: italic !important;
+  margin: 0 !important;
+}
+
+.new_style_input__Colorfy {
+  padding: 8px 12px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  margin-right: 10px !important;
+  background-color: white !important;
+  color: #333 !important;
+}
+
+.new_style_input__Colorfy:focus {
+  outline: none !important;
+  border-color: #007cba !important;
+}
+
+.confirm_add_btn__Colorfy {
+  background-color: #28a745 !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 15px !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+  margin-right: 10px !important;
+}
+
+.confirm_add_btn__Colorfy:hover {
+  background-color: #218838 !important;
+}
+
+.cancel_add_btn__Colorfy {
+  background-color: #6c757d !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 15px !important;
+  border-radius: 5px !important;
+  font-size: 14px !important;
+  cursor: pointer !important;
+}
+
+.cancel_add_btn__Colorfy:hover {
+  background-color: #5a6268 !important;
+}
+
+/* Dark scheme styles for style selector */
+.Colorfy_dark-scheme .style_selector_wrapper__Colorfy {
+  border-bottom-color: #555 !important;
+}
+
+.Colorfy_dark-scheme .style_select__Colorfy {
+  background-color: #444 !important;
+  color: #fff !important;
+  border-color: #555 !important;
+}
+
+.Colorfy_dark-scheme .style_edit_content__Colorfy {
+  background-color: #444 !important;
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .style_edit_close__Colorfy {
+  color: #ccc !important;
+}
+
+.Colorfy_dark-scheme .style_edit_close__Colorfy:hover {
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .style_edit_title__Colorfy {
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .style_item__Colorfy {
+  background-color: #555 !important;
+  border-color: #666 !important;
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .style_item__Colorfy.active {
+  background-color: #2c5aa0 !important;
+  border-color: #4d79a4 !important;
+}
+
+.Colorfy_dark-scheme .style_name__Colorfy {
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .style_name__Colorfy.readonly {
+  color: #bbb !important;
+}
+
+.Colorfy_dark-scheme .style_name_input__Colorfy {
+  background-color: #333 !important;
+  color: #fff !important;
+  border-color: #666 !important;
+}
+
+.Colorfy_dark-scheme .style_name_input__Colorfy:focus {
+  border-color: #007cba !important;
+}
+
+.Colorfy_dark-scheme .element_count__Colorfy {
+  color: #bbb !important;
+}
+
+.Colorfy_dark-scheme .new_style_input__Colorfy {
+  background-color: #333 !important;
+  color: #fff !important;
+  border-color: #666 !important;
+}
+
+.Colorfy_dark-scheme .new_style_input__Colorfy:focus {
+  border-color: #007cba !important;
+}
+
+.Colorfy_dark-scheme .add_new_style__Colorfy {
+  border-color: #666 !important;
+  color: #fff !important;
+}
+
+.Colorfy_dark-scheme .max_styles_message__Colorfy {
+  color: #bbb !important;
+}
+
+.Colorfy_dark-scheme .style_help_message__Colorfy {
+  background-color: #5a4a00 !important;
+  color: #fff3cd !important;
+  border-left-color: #ffc107 !important;
 }

@@ -49,19 +49,36 @@ const createPaletteWrapper = (callback) => {
   // Load dev mode setting and create UI after it's loaded
   chrome.storage.local.get("Colorfy_devMode", (data) => {
     devMode = data.Colorfy_devMode || false; // Default to false
-    createPaletteWrapperInternal();
-    
-    // Call callback after UI is created
-    if (callback && typeof callback === 'function') {
-      callback();
-    }
+    createPaletteWrapperInternal(callback);
   });
 };
 
 /**
  * Internal function to create the palette wrapper after dev mode is loaded
  */
-const createPaletteWrapperInternal = () => {
+const createPaletteWrapperInternal = (callback) => {
+  // Initialize styles first - with retry logic for loading order
+  const initializeStylesWithRetry = (retryCount = 0) => {
+    if (window.initializeStyles && typeof window.initializeStyles === 'function') {
+      window.initializeStyles(() => {
+        createPaletteElements(callback);
+      });
+    } else if (retryCount < 10) {
+      // Retry after a short delay if not loaded yet
+      setTimeout(() => initializeStylesWithRetry(retryCount + 1), 100);
+    } else {
+      console.error('initializeStyles function not available after retries, proceeding without style initialization');
+      createPaletteElements(callback);
+    }
+  };
+  
+  initializeStylesWithRetry();
+};
+
+/**
+ * Create the palette elements
+ */
+const createPaletteElements = (callback) => {
   // Semi-transparent overlay
   modalWrapper = document.createElement("div");
   modalWrapper.id = "colorfy_modal";
@@ -82,6 +99,16 @@ const createPaletteWrapperInternal = () => {
   closeBtn.title = "Cancel";
   closeBtn.onclick = closeColorfy;
   paletteWrapper.appendChild(closeBtn);
+
+  // Create style selector
+  if (window.createStyleSelector) {
+    window.createStyleSelector(paletteWrapper);
+  }
+
+  // Add storage warning if needed
+  checkAndShowStorageWarning(paletteWrapper).catch((error) => {
+    console.error('❌ checkAndShowStorageWarning failed:', error);
+  });
 
   // Container for background/text color pickers
   colorsWrapper = document.createElement("div");
@@ -114,6 +141,16 @@ const createPaletteWrapperInternal = () => {
   applyColorSchemeOption();
   // Build advanced changes UI
   addSavedItems();
+  
+  // Update editing state based on current style
+  if (window.updateEditingState) {
+    window.updateEditingState();
+  }
+  
+  // Call callback after all UI is created
+  if (callback && typeof callback === 'function') {
+    callback();
+  }
 };
 
 /**
@@ -343,6 +380,94 @@ const setUIReferences = (refs) => {
   modalWrapper = refs.modalWrapper;
   paletteWrapper = refs.paletteWrapper;
   colorsWrapper = refs.colorsWrapper;
+};
+
+/**
+ * Get current storage usage statistics (copied from storageVersioning.js)
+ */
+const getStorageStats = () => {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(null, (items) => {
+      const jsonString = JSON.stringify(items);
+      const bytes = new Blob([jsonString]).size;
+      
+      // TEMPORARY: Lower limits for testing (remove after testing)
+      // const maxBytes = 5 * 1024; // 5KB limit for testing (normally 10MB)
+      // const testingMode = true; // Set to false for production
+      
+      // Normal production limits (commented out for testing)
+      const maxBytes = 10 * 1024 * 1024; // 10MB limit for chrome.storage.local
+      const testingMode = false;
+      
+      const usagePercent = Math.round((bytes / maxBytes) * 100);
+      const warningThreshold = testingMode ? 60 : 80; // 60% for testing, 80% for production
+      const isNearLimit = usagePercent >= warningThreshold;
+      
+      resolve({
+        usedBytes: bytes,
+        maxBytes: maxBytes,
+        usagePercent: usagePercent,
+        isNearLimit: isNearLimit,
+        testingMode: testingMode
+      });
+    });
+  });
+};
+
+/**
+ * Format bytes to human readable format (copied from storageVersioning.js)
+ */
+const formatBytes = (bytes) => {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+/**
+ * Check storage usage and show warning if near limit
+ */
+const checkAndShowStorageWarning = async (paletteWrapper) => {
+  try {
+    const stats = await getStorageStats();
+
+    if (stats.isNearLimit) {
+      // Create warning banner
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'storage_warning__Colorfy';
+      
+      const testingNote = stats.testingMode ? '<br><small style="color: #007bff;"><strong>🧪 TESTING MODE:</strong> Using 5KB limit at 60% threshold</small>' : '';
+      
+      warningDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: #856404;">
+          <span style="font-size: 16px;">⚠️</span>
+          <div>
+            <strong>Storage Warning:</strong> ${formatBytes(stats.usedBytes)} of ${formatBytes(stats.maxBytes)} used (${stats.usagePercent}%)
+            <br><small>Consider clearing old data in extension options to continue using Colorfy.</small>
+            ${testingNote}
+          </div>
+        </div>
+      `;
+      
+      // Insert after style selector or at beginning
+      const styleSelector = paletteWrapper.querySelector('.style_selector_wrapper__Colorfy');
+      if (styleSelector) {
+        styleSelector.after(warningDiv);
+      } else {
+        const closeBtn = paletteWrapper.querySelector('.closeColorfy__Colorfy');
+        if (closeBtn) {
+          closeBtn.after(warningDiv);
+        } else {
+          paletteWrapper.appendChild(warningDiv);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error checking storage stats:', error);
+  }
 };
 
 // Make functions globally accessible

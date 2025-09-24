@@ -99,7 +99,6 @@ const getOptimalTextColor = (backgroundColor) => {
     // Return black for light backgrounds, white for dark backgrounds
     return brightness > 155 ? 'black' : 'white';
   } catch (e) {
-    console.warn('Could not parse color:', backgroundColor, e);
     return 'black'; // Default to black if color parsing fails
   }
 };
