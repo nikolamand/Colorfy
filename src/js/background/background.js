@@ -112,6 +112,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       color: "#3C1A5B",
       tabId: sender.tab.id
     });
+  } else if (message.type === 'openOptionsPage') {
+    // Open the extension's options page
+    chrome.runtime.openOptionsPage();
   }
   // Always call sendResponse if you expect to keep the channel open or confirm receipt
   sendResponse({status: 'ok'});

@@ -444,13 +444,22 @@ const checkAndShowStorageWarning = async (paletteWrapper) => {
       warningDiv.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: #856404;">
           <span style="font-size: 16px;">⚠️</span>
-          <div>
+          <div style="flex: 1;">
             <strong>Storage Warning:</strong> ${formatBytes(stats.usedBytes)} of ${formatBytes(stats.maxBytes)} used (${stats.usagePercent}%)
-            <br><small>Consider clearing old data in extension options to continue using Colorfy.</small>
+            <br><small>Consider clearing old data to continue using Colorfy.</small>
             ${testingNote}
           </div>
+          <button id="storage-options-btn" style="background: #856404; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='#6c4f03'" onmouseout="this.style.backgroundColor='#856404'">
+            Manage Data
+          </button>
         </div>
       `;
+      
+      // Add click handler for the manage storage button
+      warningDiv.querySelector('#storage-options-btn').addEventListener('click', () => {
+        // Send message to background script to open options page
+        chrome.runtime.sendMessage({ type: 'openOptionsPage' });
+      });
       
       // Insert after style selector or at beginning
       const styleSelector = paletteWrapper.querySelector('.style_selector_wrapper__Colorfy');

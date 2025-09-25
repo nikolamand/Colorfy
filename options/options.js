@@ -404,16 +404,20 @@
                   const elementCount = style.elements ? style.elements.length : 0;
                   
                   urlStyles.push({
-                    id: `style-${index}`,
+                    id: style.id || `style-${index}`,
                     name: style.name || `Style ${index + 1}`,
                     elementCount: elementCount,
                     size: styleSize,
                     lastModified: style.lastModified || style.createdAt,
+                    isOriginal: style.isOriginal || style.id === 'original' || style.name === 'Original',
                     data: style
                   });
                   
                   colorCount += elementCount;
-                  styleCount++;
+                  // Only count non-original styles in the style count
+                  if (!style.isOriginal && style.id !== 'original' && style.name !== 'Original') {
+                    styleCount++;
+                  }
                 });
                 lastMod = urlData.migratedAt || urlData.lastModified;
               } else if (urlData.elements && Array.isArray(urlData.elements)) {
@@ -512,7 +516,7 @@
       websiteDiv.className = 'category-item website-item';
       websiteDiv.dataset.domain = website.domain;
       
-      // Check if website has multiple styles
+      // Check if website has multiple custom styles (worth showing individual selection)
       const hasMultipleStyles = website.totalStyles > 1;
       
       websiteDiv.innerHTML = `
@@ -527,14 +531,14 @@
               <div class="category-name">${website.domain}</div>
               <div class="category-description">
                 ${website.urls.length} page${website.urls.length !== 1 ? 's' : ''} • 
-                ${website.totalStyles} style${website.totalStyles !== 1 ? 's' : ''} • 
+                ${website.totalStyles} custom style${website.totalStyles !== 1 ? 's' : ''} • 
                 ${website.totalColors} element${website.totalColors !== 1 ? 's' : ''} • 
                 Last used: ${lastModified}
               </div>
             </div>
             <div class="category-stats">
               <div class="category-size">${(window.formatBytes || formatBytes)(website.totalSize)} (${percentage}%)</div>
-              <div class="category-count">${website.totalStyles} style${website.totalStyles !== 1 ? 's' : ''}</div>
+              <div class="category-count">${website.totalStyles} custom style${website.totalStyles !== 1 ? 's' : ''}</div>
             </div>
           </div>
         </div>
@@ -615,6 +619,11 @@
   function populateStylesList(container, website, websiteCheckbox) {
     website.urls.forEach(urlData => {
       urlData.styles.forEach(style => {
+        // Skip Original style - it should only be deleted with the whole website
+        if (style.isOriginal || style.id === 'original' || style.name === 'Original') {
+          return;
+        }
+        
         const styleDiv = document.createElement('div');
         styleDiv.className = 'style-item';
         
@@ -631,9 +640,7 @@
             <div class="style-details">
               <div class="style-name">${style.name}</div>
               <div class="style-description">
-                ${urlData.url.replace(/^https?:\/\//, '')} • 
-                ${style.elementCount} element${style.elementCount !== 1 ? 's' : ''} • 
-                Modified: ${lastMod}
+                ${style.elementCount} element${style.elementCount !== 1 ? 's' : ''}
               </div>
             </div>
             <div class="style-stats">
@@ -802,10 +809,14 @@
                   if (urlStyles.length > 0 && urlData.styles && Array.isArray(urlData.styles)) {
                     // Remove specific styles from this URL
                     const updatedStyles = urlData.styles.filter(style => {
-                      const styleIndex = urlData.styles.indexOf(style);
                       const shouldDelete = urlStyles.some(s => 
-                        s.styleId === `style-${styleIndex}` || s.styleId === 'legacy-style'
+                        s.styleId === style.id || s.styleId === `style-${urlData.styles.indexOf(style)}`
                       );
+                      
+                      // Never delete original style in individual deletions
+                      if (style.isOriginal || style.id === 'original' || style.name === 'Original') {
+                        return true; // Keep original style
+                      }
                       
                       if (shouldDelete) {
                         deletedStyles++;
@@ -817,14 +828,19 @@
                       return true;
                     });
                     
-                    if (updatedStyles.length > 0) {
+                    // Check if any non-original styles remain
+                    const hasNonOriginalStyles = updatedStyles.some(style => 
+                      !style.isOriginal && style.id !== 'original' && style.name !== 'Original'
+                    );
+                    
+                    if (hasNonOriginalStyles) {
                       // Keep URL with remaining styles
                       updatedStylesData[url] = {
                         ...urlData,
                         styles: updatedStyles
                       };
                     } else {
-                      // URL has no styles left, remove it entirely
+                      // URL has no meaningful styles left, remove it entirely
                       deletedUrls++;
                     }
                   } else if (urlStyles.length > 0 && urlData.elements) {
