@@ -14,11 +14,8 @@
   "warningElement": {
     "message": "Ovaj element se ne može menjati!"
   },
-  "pageReset": {
-    "message": "Vrati stranicu na prvobitno stanje"
-  },
-  "pageResetConfirm": {
-    "message": "Da li ste sigurni da želite da uklonite sve promene na stranici?\nStranica će se automatski osvežiti prilikom uklanjanja"
+  "switchToOriginal": {
+    "message": "Colorfy: Prebaci na Original"
   },
   "optionsResetButton": {
     "message": "Ukloni SVE promjene"
@@ -29,8 +26,62 @@
   "optionsResetSuccess": {
     "message": "Sve sačuvane promjene su uklonjene!"
   },
-
   "description": {
     "message": "Lako promijenite boje elemenata na web stranici."
+  },
+  
+  "editButton": {
+    "message": "Uredi"
+  },
+  "manageStyles": {
+    "message": "Upravljaj stilovima"
+  },
+  "helpMessage": {
+    "message": "💡 Odaberite stil drugačiji od 'Original' za promjene"
+  },
+  "manageStylesTitle": {
+    "message": "Upravljaj stilovima"
+  },
+  "deleteStyle": {
+    "message": "Obriši stil"
+  },
+  "cloneStyle": {
+    "message": "Kopiraj ovaj stil"
+  },
+  "addNewStyle": {
+    "message": "Dodaj novi stil"
+  },
+  "maxStylesMessage": {
+    "message": "Maksimalno 5 stilova dozvoljeno po web lokaciji"
+  },
+  "addButton": {
+    "message": "Dodaj"
+  },
+  "cancelButton": {
+    "message": "Otkaži"
+  },
+  "okButton": {
+    "message": "OK"
+  },
+  "closeButton": {
+    "message": "Otkaži"
+  },
+  "advancedChanges": {
+    "message": "Napredne promjene"
+  },
+  "addItem": {
+    "message": "Dodaj stavku"
+  },
+  "addNewItem": {
+    "message": "Dodaj novu stavku"
+  },
+  "closeAdvancedChanges": {
+    "message": "Zatvori napredne promjene"
+  },
+  "enterStyleName": {
+    "message": "Unesite ime stila"
+  },
+  "changes": {
+    "message": "promjene"
   }
 }

@@ -76,8 +76,31 @@
       }
       setSelectionMode(true);
       sendResponse({ status: 'ready' });
+    } else if (message.type === 'switchToOriginal') {
+      // Switch to original style and refresh the page styling
+      switchToOriginalStyle(message.baseUrl);
+      sendResponse({ status: 'switched' });
     }
   });
+
+  // Function to switch to original style
+  async function switchToOriginalStyle(baseUrl) {
+    try {
+      // Update storage to set active style to original
+      const stylesData = await Storage.getStyles();
+      if (stylesData[baseUrl]) {
+        stylesData[baseUrl].activeStyle = 'original';
+        await Storage.setStyles(stylesData);
+        
+        // Refresh the page styling by reloading styles
+        location.reload();
+      }
+    } catch (error) {
+      console.error('Error switching to original style:', error);
+      // Fallback: just reload the page
+      location.reload();
+    }
+  }
 
   // Boot up
   init();

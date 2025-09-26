@@ -96,7 +96,7 @@ const createPaletteElements = (callback) => {
   const closeBtn = document.createElement("span");
   closeBtn.className = "closeColorfy__Colorfy";
   closeBtn.innerHTML = "&times;";
-  closeBtn.title = "Cancel";
+  closeBtn.title = chrome.i18n.getMessage("closeButton");
   closeBtn.onclick = closeColorfy;
   paletteWrapper.appendChild(closeBtn);
 
@@ -120,7 +120,7 @@ const createPaletteElements = (callback) => {
   const selectBtn = document.createElement("button");
   selectBtn.id = "colorfy_submit";
   selectBtn.className = "colorfy_submit__Colorfy";
-  selectBtn.innerHTML = "OK";
+  selectBtn.innerHTML = chrome.i18n.getMessage("okButton");
   selectBtn.onclick = selectedChanges;
   paletteWrapper.appendChild(selectBtn);
 
@@ -129,7 +129,7 @@ const createPaletteElements = (callback) => {
   savedItemsButton.id = "saved_items_button";
   savedItemsButton.className = "saved_items_button__Colorfy";
   savedItemsButton.innerHTML = `<span class="material-symbols-outlined">manufacturing</span>`;
-  savedItemsButton.title = "Advanced changes";
+  savedItemsButton.title = chrome.i18n.getMessage("advancedChanges");
   // Use the loaded devMode value and use !important to override CSS
   if (devMode) {
     savedItemsButton.style.setProperty('display', 'flex', 'important');
@@ -242,21 +242,21 @@ const addSavedItems = () => {
   manualInputAdd.id = "manual_input_add";
   manualInputAdd.className = "manual_input_add__Colorfy";
   manualInputAdd.innerHTML = `<span class="material-symbols-outlined">check_circle</span>`;
-  manualInputAdd.title = "Add item";
+  manualInputAdd.title = chrome.i18n.getMessage("addItem");
   manualButtonsWrapper.appendChild(manualInputAdd);
 
   const manualInputCancel = document.createElement("div");
   manualInputCancel.id = "manual_input_cancel";
   manualInputCancel.className = "manual_input_cancel__Colorfy";
   manualInputCancel.innerHTML = `<span class="material-symbols-outlined">cancel</span>`;
-  manualInputCancel.title = "Cancel";
+  manualInputCancel.title = chrome.i18n.getMessage("cancelButton");
   manualButtonsWrapper.appendChild(manualInputCancel);
 
   // Show/hide "Add New Item"
   const manualInputShow = document.createElement("div");
   manualInputShow.id = "manual_input_show";
   manualInputShow.className = "manual_input_show__Colorfy";
-  manualInputShow.title = "Add new item";
+  manualInputShow.title = chrome.i18n.getMessage("addNewItem");
   manualInputShow.innerHTML = `<span class="material-symbols-outlined">add_circle</span>`;
   optionsWrapper.appendChild(manualInputShow);
 
@@ -333,7 +333,7 @@ const addSavedItems = () => {
       const closeOptionsBtn = document.createElement("span");
       closeOptionsBtn.className = "close_options__Colorfy";
       closeOptionsBtn.innerHTML = `<span class="material-symbols-outlined">close</span>`;
-      closeOptionsBtn.title = "Close advanced changes";
+      closeOptionsBtn.title = chrome.i18n.getMessage("closeAdvancedChanges");
       closeOptionsBtn.onclick = closeColorfy;
       optionsWrapper.appendChild(closeOptionsBtn);
 

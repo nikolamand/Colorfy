@@ -22,8 +22,8 @@ const createStyleSelector = (paletteWrapper) => {
   // Edit button
   const editBtn = document.createElement("button");
   editBtn.className = "style_edit_btn__Colorfy";
-  editBtn.innerHTML = "Edit";
-  editBtn.title = "Manage styles";
+  editBtn.innerHTML = chrome.i18n.getMessage("editButton");
+  editBtn.title = chrome.i18n.getMessage("manageStyles");
   
   topRow.appendChild(styleSelect);
   topRow.appendChild(editBtn);
@@ -33,7 +33,7 @@ const createStyleSelector = (paletteWrapper) => {
   const helpMessage = document.createElement("div");
   helpMessage.className = "style_help_message__Colorfy";
   helpMessage.id = "colorfy_style_help";
-  helpMessage.innerHTML = "💡 Select a style other than 'Original' to make changes";
+  helpMessage.innerHTML = chrome.i18n.getMessage("helpMessage");
   helpMessage.style.display = "none"; // Initially hidden
   
   styleSelectorWrapper.appendChild(helpMessage);
@@ -48,6 +48,9 @@ const createStyleSelector = (paletteWrapper) => {
   
   // Populate the dropdown
   populateStyleSelector();
+  
+  // Update help message immediately after populating
+  updateHelpMessage();
   
   // Auto-select first editable style if Original is currently selected AND no changes exist
   const currentStyle = window.getCurrentStyle();
@@ -112,12 +115,19 @@ const populateStyleSelector = () => {
 /**
  * Update the help message based on current style
  */
-const updateHelpMessage = (currentStyle) => {
+const updateHelpMessage = (styleId) => {
   const helpElement = document.getElementById("colorfy_style_help");
   if (!helpElement) return;
   
-  if (currentStyle && currentStyle === "original") {
-    helpElement.innerHTML = "💡 Select a style other than 'Original' to make changes";
+  // If no styleId provided, get the current style
+  let currentStyleId = styleId;
+  if (!currentStyleId) {
+    const currentStyle = window.getCurrentStyle();
+    currentStyleId = currentStyle ? currentStyle.id : null;
+  }
+  
+  if (currentStyleId === "original") {
+    helpElement.innerHTML = chrome.i18n.getMessage("helpMessage");
     helpElement.style.display = "flex";
   } else {
     // Hide the message for editable styles
@@ -162,7 +172,7 @@ const openStyleEditModal = () => {
   
   // Title
   const title = document.createElement("h3");
-  title.textContent = "Manage Styles";
+  title.textContent = chrome.i18n.getMessage("manageStylesTitle");
   title.className = "style_edit_title__Colorfy";
   
   // Styles list
@@ -230,7 +240,7 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
     
     // Element count
     const elementCount = document.createElement("span");
-    elementCount.textContent = `(${style.elements.length} changes)`;
+    elementCount.textContent = `(${style.elements.length} ${chrome.i18n.getMessage("changes")})`;
     elementCount.className = "element_count__Colorfy";
     styleItem.appendChild(elementCount);
     
@@ -239,7 +249,7 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
       const deleteBtn = document.createElement("button");
       deleteBtn.innerHTML = "×";
       deleteBtn.className = "style_delete_btn__Colorfy";
-      deleteBtn.title = "Delete style";
+      deleteBtn.title = chrome.i18n.getMessage("deleteStyle");
       deleteBtn.onclick = () => handleStyleDelete(style.id);
       styleItem.appendChild(deleteBtn);
       
@@ -247,7 +257,7 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
       const cloneBtn = document.createElement("button");
       cloneBtn.innerHTML = "📋";
       cloneBtn.className = "style_clone_btn__Colorfy";
-      cloneBtn.title = "Clone this style";
+      cloneBtn.title = chrome.i18n.getMessage("cloneStyle");
       cloneBtn.onclick = () => handleStyleClone(style);
       styleItem.appendChild(cloneBtn);
     }
@@ -260,13 +270,13 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
   
   if (styles.length < 5) { // Max 5 styles
     const addButton = document.createElement("button");
-    addButton.textContent = "Add New Style";
+    addButton.textContent = chrome.i18n.getMessage("addNewStyle");
     addButton.className = "add_style_btn__Colorfy";
     addButton.onclick = showAddStyleForm;
     addNewSection.appendChild(addButton);
   } else {
     const maxMessage = document.createElement("p");
-    maxMessage.textContent = "Maximum 5 styles allowed per website";
+    maxMessage.textContent = chrome.i18n.getMessage("maxStylesMessage");
     maxMessage.className = "max_styles_message__Colorfy";
     addNewSection.appendChild(maxMessage);
   }
@@ -282,15 +292,15 @@ const showAddStyleForm = () => {
   
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "Enter style name";
+  input.placeholder = chrome.i18n.getMessage("enterStyleName");
   input.className = "new_style_input__Colorfy";
   
   const addBtn = document.createElement("button");
-  addBtn.textContent = "Add";
+  addBtn.textContent = chrome.i18n.getMessage("addButton");
   addBtn.className = "confirm_add_btn__Colorfy";
   
   const cancelBtn = document.createElement("button");
-  cancelBtn.textContent = "Cancel";
+  cancelBtn.textContent = chrome.i18n.getMessage("cancelButton");
   cancelBtn.className = "cancel_add_btn__Colorfy";
   
   addNewSection.appendChild(input);

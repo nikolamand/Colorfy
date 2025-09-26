@@ -14,11 +14,8 @@
   "warningElement": {
     "message": "This element can not be changed!"
   },
-  "pageReset": {
-    "message": "Remove all changes from website"
-  },
-  "pageResetConfirm": {
-    "message": "Are you sure you want to remove changes from the page?\nPage will be refreshed automatically after confirmation"
+  "switchToOriginal": {
+    "message": "Colorfy: Switch to Original"
   },
   "optionsResetButton": {
     "message": "Clear ALL changes"
@@ -29,8 +26,62 @@
   "optionsResetSuccess": {
     "message": "All saved changes have been removed!"
   },
-
   "description": {
     "message": "Change colors of elements on a web page easily."
+  },
+  
+  "editButton": {
+    "message": "Edit"
+  },
+  "manageStyles": {
+    "message": "Manage styles"
+  },
+  "helpMessage": {
+    "message": "💡 Select a style other than 'Original' to make changes"
+  },
+  "manageStylesTitle": {
+    "message": "Manage Styles"
+  },
+  "deleteStyle": {
+    "message": "Delete style"
+  },
+  "cloneStyle": {
+    "message": "Clone this style"
+  },
+  "addNewStyle": {
+    "message": "Add New Style"
+  },
+  "maxStylesMessage": {
+    "message": "Maximum 5 styles allowed per website"
+  },
+  "addButton": {
+    "message": "Add"
+  },
+  "cancelButton": {
+    "message": "Cancel"
+  },
+  "okButton": {
+    "message": "OK"
+  },
+  "closeButton": {
+    "message": "Cancel"
+  },
+  "advancedChanges": {
+    "message": "Advanced changes"
+  },
+  "addItem": {
+    "message": "Add item"
+  },
+  "addNewItem": {
+    "message": "Add new item"
+  },
+  "closeAdvancedChanges": {
+    "message": "Close advanced changes"
+  },
+  "enterStyleName": {
+    "message": "Enter style name"
+  },
+  "changes": {
+    "message": "changes"
   }
 }

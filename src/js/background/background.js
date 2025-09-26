@@ -260,52 +260,64 @@ function getBaseURL(urlString) {
 }
 
 /**
- * Remove saved colors for the URL of the currently opened tab.
- * We cannot confirm with the user here (no alerts/confirm in service worker).
- * If you want a confirm, do it from the content script or options page.
+ * Switch to Original style for the current tab's website
+ * This allows users to quickly see the unmodified webpage
  */
-function clearColorsForActiveTab() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (!tabs.length) return;
-    
-    const tab = tabs[0];
-    const url = tab.url;
-    
-    // Check if URL is valid
-    if (!isValidUrl(url)) {
-      return;
-    }
-    
-    const base = getBaseURL(url);
-    if (!base) return;
+function switchToOriginalStyle(tab) {
+  // Check if URL is valid
+  if (!isValidUrl(tab.url)) {
+    return;
+  }
+  
+  const baseUrl = getBaseURL(tab.url);
+  if (!baseUrl) return;
 
-    chrome.storage.local.get(["Colorfy"], (data) => {
-      if (data["Colorfy"]) {
-        let storedData = JSON.parse(data["Colorfy"]) || [];
-        // Find the record with the matching base URL
-        const index = storedData.findIndex(item => item.url === base);
-        if (index > -1) {
-          storedData.splice(index, 1);
-          chrome.storage.local.set({ Colorfy: JSON.stringify(storedData) }, () => {
-            // Reload after clearing (only if it's a valid URL)
-            chrome.tabs.reload(tab.id).catch((error) => {
-              // Could not reload tab, but clearing was successful
+  chrome.storage.local.get(["Colorfy_Styles"], (data) => {
+    if (data["Colorfy_Styles"]) {
+      try {
+        const stylesData = JSON.parse(data["Colorfy_Styles"]);
+        
+        // Check if this website has styles
+        if (stylesData[baseUrl] && stylesData[baseUrl].styles) {
+          // Set active style to 'original'
+          stylesData[baseUrl].activeStyle = 'original';
+          
+          // Save updated data
+          chrome.storage.local.set({ 
+            "Colorfy_Styles": JSON.stringify(stylesData) 
+          }, () => {
+            // Send message to content script to update the page
+            chrome.tabs.sendMessage(tab.id, { 
+              type: 'switchToOriginal',
+              baseUrl: baseUrl 
+            }, (response) => {
+              if (chrome.runtime.lastError) {
+                // Content script might not be loaded, reload the page
+                chrome.tabs.reload(tab.id).catch((error) => {
+                  // Could not reload tab
+                });
+              }
             });
           });
+        } else {
+          // No custom styles exist for this site, page is already original
+          // Optionally show a notification that no custom styles exist
         }
+      } catch (error) {
+        console.error('Error switching to original style:', error);
       }
-    });
+    }
   });
 }
 
 /**
- * Create right-click option for removal of the saved changes.
- * We'll do this on extension install/update. 
+ * Create right-click option to switch to Original style
+ * This allows users to quickly toggle between their custom styles and the original webpage
  */
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "clearColors",
-    title: chrome.i18n.getMessage("pageReset"),
+    id: "switchToOriginal",
+    title: chrome.i18n.getMessage("switchToOriginal"),
     contexts: ["page"]
   });
 });
@@ -314,10 +326,8 @@ chrome.runtime.onInstalled.addListener(() => {
  * Handle clicks on the context menu item
  */
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "clearColors") {
-    // In a service worker, we can't show alerts/confirms. 
-    // If you still want to confirm, do it in the content script or the options page.
-    clearColorsForActiveTab();
+  if (info.menuItemId === "switchToOriginal") {
+    switchToOriginalStyle(tab);
   }
 });
 
