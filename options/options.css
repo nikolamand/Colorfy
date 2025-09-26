@@ -200,6 +200,55 @@ button#manage-storage-btn:hover {
   box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
 }
 
+/* Migration button styles */
+button#manual-migration-btn {
+  background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+  box-shadow: 0 2px 8px rgba(67, 206, 162, 0.3);
+}
+
+button#manual-migration-btn:hover {
+  box-shadow: 0 4px 15px rgba(67, 206, 162, 0.4);
+}
+
+button#manual-migration-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+button#delete-backup-btn {
+  background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+  box-shadow: 0 2px 8px rgba(255, 117, 140, 0.3);
+}
+
+button#delete-backup-btn:hover {
+  box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+}
+
+button#delete-backup-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Migration buttons container */
+#migration-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#migration-buttons button {
+  min-width: 120px;
+}
+
+#backup-info {
+  background-color: #f8f9fa;
+  border-left: 3px solid #007bff;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .options-container {

@@ -79,6 +79,26 @@
           </div>
         </div>
 
+        <div class="option" id="migration-option" style="display: none;">
+          <div class="option-info">
+            <label for="migration-tools">Data Migration Tools</label>
+            <div class="option-description">
+              <div id="migration-description">Migrate from old storage format or manage migration backups</div>
+              <div id="backup-info" style="display: none; margin-top: 8px; font-size: 12px; color: #666;">
+                <strong>Migration Backup:</strong> <span id="backup-size-text">Calculating...</span> - 
+                This backup can be safely deleted after confirming your data migrated correctly. 
+                Deleting it will free up storage space.
+              </div>
+            </div>
+          </div>
+          <div class="option-control">
+            <div id="migration-buttons">
+              <button id="manual-migration-btn" type="button" style="display: none;">Run Migration</button>
+              <button id="delete-backup-btn" type="button" style="display: none;">Delete Backup</button>
+            </div>
+          </div>
+        </div>
+
         <div class="option">
           <div class="option-info">
             <label for="manage-storage">Manage Saved Colors</label>

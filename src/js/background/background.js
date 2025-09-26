@@ -9,8 +9,13 @@ chrome.runtime.onStartup.addListener(() => {
   initializeStorage();
 });
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
   initializeStorage();
+  
+  // Run migration on install or update
+  if (details.reason === 'install' || details.reason === 'update') {
+    runMigrationInBackground();
+  }
 });
 
 // Initialize storage versioning
@@ -23,6 +28,128 @@ async function initializeStorage() {
     // we'll handle versioning in content scripts instead
   } catch (error) {
     // Storage versioning will be handled by content scripts
+  }
+}
+
+// Run migration in background script context
+function runMigrationInBackground() {
+  // Import the storageVersioning script if not already loaded
+  try {
+    if (typeof importScripts !== 'undefined') {
+      importScripts('src/js/modules/storageVersioning.js');
+    }
+  } catch (e) {
+    // Script may already be loaded
+  }
+
+  // Check if migration is needed
+  chrome.storage.local.get(['Colorfy_Storage_Version', 'Colorfy'], (data) => {
+    const currentVersion = data['Colorfy_Storage_Version'] || 1;
+    const CURRENT_STORAGE_VERSION = 2;
+    
+    if (currentVersion < CURRENT_STORAGE_VERSION && data['Colorfy']) {
+      // Run v1 to v2 migration
+      migrateV1toV2Background(() => {
+        // Set version after migration
+        chrome.storage.local.set({ 'Colorfy_Storage_Version': CURRENT_STORAGE_VERSION });
+      });
+    }
+  });
+}
+
+// Background version of v1 to v2 migration
+function migrateV1toV2Background(callback) {
+  chrome.storage.local.get(['Colorfy', 'Colorfy_Styles'], (data) => {
+    // If v2 format already exists, skip migration
+    if (data['Colorfy_Styles']) {
+      callback();
+      return;
+    }
+    
+    // If no legacy data, skip migration
+    if (!data['Colorfy']) {
+      callback();
+      return;
+    }
+    
+    try {
+      const legacyData = JSON.parse(data['Colorfy']);
+      const newStylesData = {};
+      
+      // Handle both array and object legacy formats
+      let urlDataArray = [];
+      if (Array.isArray(legacyData)) {
+        urlDataArray = legacyData;
+      } else if (typeof legacyData === 'object' && legacyData !== null) {
+        urlDataArray = Object.values(legacyData);
+      }
+      
+      // Convert each URL's data to new format
+      urlDataArray.forEach(urlData => {
+        if (urlData && urlData.url && urlData.elements && Array.isArray(urlData.elements)) {
+          const baseUrl = getBaseUrlFromLegacy(urlData.url);
+          
+          newStylesData[baseUrl] = {
+            styles: [
+              {
+                id: 'original',
+                name: 'Original',
+                elements: [],
+                isOriginal: true,
+                createdAt: new Date().toISOString()
+              },
+              {
+                id: 'style_1',
+                name: 'Style 1',
+                elements: urlData.elements,
+                isOriginal: false,
+                createdAt: new Date().toISOString(),
+                lastModified: new Date().toISOString()
+              }
+            ],
+            activeStyle: urlData.elements.length > 0 ? 'style_1' : 'original',
+            migrated: true,
+            migratedAt: new Date().toISOString()
+          };
+        }
+      });
+      
+      // Save new format and backup
+      chrome.storage.local.set({
+        'Colorfy_Styles': JSON.stringify(newStylesData),
+        'Colorfy_Migration_Backup': data['Colorfy']
+      }, () => {
+        // Remove legacy data after successful migration
+        chrome.storage.local.remove(['Colorfy'], callback);
+      });
+      
+    } catch (e) {
+      callback(); // Continue anyway
+    }
+  });
+}
+
+// Helper function for background script
+function getBaseUrlFromLegacy(url) {
+  try {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      const urlObj = new URL(url);
+      // Use host (includes port) instead of hostname to match current system
+      return `${urlObj.protocol}//${urlObj.host}`;
+    }
+    
+    // Handle file:// URLs (local files)
+    if (url.startsWith('file://')) {
+      // For file URLs, we use "file://" as the base since there's no hostname
+      return 'file://';
+    }
+    
+    if (url.includes('.')) {
+      return `https://${url.split('/')[0]}`;
+    }
+    return url;
+  } catch (e) {
+    return url;
   }
 }
 chrome.action.onClicked.addListener((tab) => {

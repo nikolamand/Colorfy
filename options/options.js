@@ -24,7 +24,15 @@
     modalStorageDetails: document.getElementById("modal-storage-details"),
     categoriesList: document.getElementById("categories-list"),
     selectAllBtn: document.getElementById("select-all-btn"),
-    selectNoneBtn: document.getElementById("select-none-btn")
+    selectNoneBtn: document.getElementById("select-none-btn"),
+    
+    // Migration elements
+    migrationOption: document.getElementById("migration-option"),
+    migrationDescription: document.getElementById("migration-description"),
+    backupInfo: document.getElementById("backup-info"),
+    backupSizeText: document.getElementById("backup-size-text"),
+    manualMigrationBtn: document.getElementById("manual-migration-btn"),
+    deleteBackupBtn: document.getElementById("delete-backup-btn")
     
     // TODO: Uncomment when implementing new features
     // Color picker settings (not implemented yet)
@@ -83,6 +91,10 @@
   elements.storageModalApply.addEventListener("click", deleteSelectedData);
   elements.selectAllBtn.addEventListener("click", selectAllCategories);
   elements.selectNoneBtn.addEventListener("click", selectNoCategories);
+
+  // Migration event listeners
+  elements.manualMigrationBtn.addEventListener("click", runManualMigration);
+  elements.deleteBackupBtn.addEventListener("click", deleteMigrationBackup);
 
   // Close modal when clicking outside
   elements.storageModal.addEventListener("click", (e) => {
@@ -886,5 +898,109 @@
       alert('An error occurred while deleting the data.');
     }
   }
+
+  // Migration functions
+  async function runManualMigration() {
+    try {
+      elements.manualMigrationBtn.textContent = 'Running Migration...';
+      elements.manualMigrationBtn.disabled = true;
+
+      const result = await window.runManualMigration();
+      
+      if (result.success) {
+        alert(result.message);
+        updateMigrationUI(); // Refresh UI
+        updateStorageInfo(); // Refresh storage info
+      } else {
+        alert('Migration Status: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Migration error:', error);
+      alert('An error occurred during migration. Please try again.');
+    } finally {
+      elements.manualMigrationBtn.textContent = 'Run Migration';
+      elements.manualMigrationBtn.disabled = false;
+    }
+  }
+
+  async function deleteMigrationBackup() {
+    if (!confirm('Are you sure you want to delete the migration backup? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      elements.deleteBackupBtn.textContent = 'Deleting...';
+      elements.deleteBackupBtn.disabled = true;
+
+      const result = await window.deleteMigrationBackup();
+      
+      if (result.success) {
+        alert(result.message);
+        updateMigrationUI(); // Refresh UI
+        updateStorageInfo(); // Refresh storage info
+      } else {
+        alert('Delete Status: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Delete backup error:', error);
+      alert('An error occurred while deleting backup. Please try again.');
+    } finally {
+      elements.deleteBackupBtn.textContent = 'Delete Backup';
+      elements.deleteBackupBtn.disabled = false;
+    }
+  }
+
+  async function updateMigrationUI() {
+    try {
+      // Check if legacy data exists and get its size
+      const legacyExists = await new Promise(resolve => {
+        chrome.storage.local.get(['Colorfy'], data => {
+          resolve(!!data['Colorfy']);
+        });
+      });
+
+      const legacySize = await window.getLegacyDataSize();
+
+      // Check if backup exists and get its size
+      const backupInfo = await window.hasMigrationBackup();
+
+      // Show migration section if legacy data exists or backup exists
+      const shouldShowMigration = legacyExists || backupInfo.exists;
+      elements.migrationOption.style.display = shouldShowMigration ? 'flex' : 'none';
+
+      if (!shouldShowMigration) return;
+
+      // Update migration button
+      if (legacyExists) {
+        elements.manualMigrationBtn.style.display = 'inline-block';
+        elements.manualMigrationBtn.disabled = false;
+        elements.manualMigrationBtn.textContent = 'Run Migration';
+        
+        // Update description to show migration info
+        elements.migrationDescription.textContent = `Migrate legacy data (${window.formatBytes(legacySize)}) to new format. A backup will be created for safety.`;
+      } else {
+        elements.manualMigrationBtn.style.display = 'none';
+        elements.migrationDescription.textContent = 'Migration completed. You can manage the backup below.';
+      }
+
+      // Update backup info and button
+      if (backupInfo.exists) {
+        elements.backupInfo.style.display = 'block';
+        elements.backupSizeText.textContent = window.formatBytes(backupInfo.size);
+        elements.deleteBackupBtn.style.display = 'inline-block';
+        elements.deleteBackupBtn.disabled = false;
+      } else {
+        elements.backupInfo.style.display = 'none';
+        elements.deleteBackupBtn.style.display = 'none';
+      }
+    } catch (error) {
+      console.error('Error updating migration UI:', error);
+    }
+  }
+
+  // Initialize migration UI when page loads
+  setTimeout(() => {
+    updateMigrationUI();
+  }, 500);
 
 })();
