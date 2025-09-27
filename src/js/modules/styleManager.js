@@ -27,13 +27,15 @@ const initializeStyles = (callback) => {
     // Check if this is a legacy user with existing data
     chrome.storage.local.get(["Colorfy"], (legacyData) => {
       if (!stylesData[currentUrl]) {
-        // Initialize styles for this URL
+        // Check if there's legacy data to migrate
         if (legacyData.Colorfy) {
           // Migrate legacy data
           migrateLegacyData(currentUrl, legacyData.Colorfy, stylesData, callback);
         } else {
-          // New user - create default styles
-          createDefaultStyles(currentUrl, stylesData, callback);
+          // New user - don't create styles yet, just set defaults
+          availableStyles = [];
+          currentStyleId = null;
+          if (callback) callback();
         }
       } else {
         // Load existing styles
@@ -118,6 +120,42 @@ const createDefaultStyles = (currentUrl, stylesData, callback) => {
   // Save the new structure
   chrome.storage.local.set({ Colorfy_Styles: JSON.stringify(stylesData) }, () => {
     if (callback) callback();
+  });
+};
+
+/**
+ * Ensure styles are created for the current URL (lazy initialization)
+ * This is called when the user first opens the modal
+ */
+const ensureStylesExist = (callback) => {
+  const currentUrl = window.getBaseURL ? window.getBaseURL() : window.location.origin;
+  
+  // If styles already exist, just continue
+  if (availableStyles && availableStyles.length > 0) {
+    if (callback) callback();
+    return;
+  }
+  
+  // Get current styles data and create defaults if needed
+  chrome.storage.local.get(["Colorfy_Styles"], (data) => {
+    let stylesData = {};
+    if (data.Colorfy_Styles) {
+      try {
+        stylesData = JSON.parse(data.Colorfy_Styles);
+      } catch (e) {
+        console.error('Error parsing styles data:', e);
+      }
+    }
+    
+    if (!stylesData[currentUrl]) {
+      // Create default styles now
+      createDefaultStyles(currentUrl, stylesData, callback);
+    } else {
+      // Styles exist in storage but not loaded, load them
+      availableStyles = stylesData[currentUrl].styles;
+      currentStyleId = stylesData[currentUrl].activeStyle || availableStyles[0]?.id;
+      if (callback) callback();
+    }
   });
 };
 
@@ -416,6 +454,7 @@ const canEditCurrentStyle = () => {
 
 // Make functions globally accessible
 window.initializeStyles = initializeStyles;
+window.ensureStylesExist = ensureStylesExist;
 window.getCurrentStyle = getCurrentStyle;
 window.getAllStyles = getAllStyles;
 window.switchStyle = switchStyle;

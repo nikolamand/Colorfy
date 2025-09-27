@@ -57,11 +57,19 @@ const createPaletteWrapper = (callback) => {
  * Internal function to create the palette wrapper after dev mode is loaded
  */
 const createPaletteWrapperInternal = (callback) => {
-  // Initialize styles first - with retry logic for loading order
+  // Initialize styles first, then ensure styles exist - with retry logic for loading order
   const initializeStylesWithRetry = (retryCount = 0) => {
     if (window.initializeStyles && typeof window.initializeStyles === 'function') {
       window.initializeStyles(() => {
-        createPaletteElements(callback);
+        // Now ensure styles exist (lazy creation)
+        if (window.ensureStylesExist && typeof window.ensureStylesExist === 'function') {
+          window.ensureStylesExist(() => {
+            createPaletteElements(callback);
+          });
+        } else {
+          console.error('ensureStylesExist function not available');
+          createPaletteElements(callback);
+        }
       });
     } else if (retryCount < 10) {
       // Retry after a short delay if not loaded yet
