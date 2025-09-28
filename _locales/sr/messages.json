@@ -83,5 +83,8 @@
   },
   "changes": {
     "message": "промене"
+  },
+  "optionsPageTitle": {
+    "message": "Подешавања"
   }
 }

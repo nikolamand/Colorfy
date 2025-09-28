@@ -83,5 +83,8 @@
   },
   "changes": {
     "message": "changes"
+  },
+  "optionsPageTitle": {
+    "message": "Settings"
   }
 }

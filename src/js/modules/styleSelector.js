@@ -10,9 +10,19 @@ const createStyleSelector = (paletteWrapper) => {
   const styleSelectorWrapper = document.createElement("div");
   styleSelectorWrapper.className = "style_selector_wrapper__Colorfy";
   
-  // Top row with select and edit button
+  // Top row with options link, select and edit button
   const topRow = document.createElement("div");
   topRow.className = "style_selector_top_row__Colorfy";
+  
+  // Options link
+  const optionsLink = document.createElement("button");
+  optionsLink.className = "options_link__Colorfy";
+  optionsLink.innerHTML = `<span class="material-symbols-outlined">settings</span>`;
+  optionsLink.title = chrome.i18n.getMessage("optionsPageTitle") || "Options";
+  optionsLink.onclick = () => {
+    // Send message to background script to open options page
+    chrome.runtime.sendMessage({ type: 'openOptionsPage' });
+  };
   
   // Style selector dropdown
   const styleSelect = document.createElement("select");
@@ -25,6 +35,7 @@ const createStyleSelector = (paletteWrapper) => {
   editBtn.innerHTML = chrome.i18n.getMessage("editButton");
   editBtn.title = chrome.i18n.getMessage("manageStyles");
   
+  topRow.appendChild(optionsLink);
   topRow.appendChild(styleSelect);
   topRow.appendChild(editBtn);
   styleSelectorWrapper.appendChild(topRow);

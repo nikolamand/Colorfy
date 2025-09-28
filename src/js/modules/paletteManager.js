@@ -25,7 +25,7 @@ const colapsePreviousElement = (paletteName, text) => {
   )[0];
   const collapseButton = document.createElement("div");
   collapseButton.className = "colapse_button__Colorfy";
-  collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">add_circle</span>`;
+  collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">keyboard_arrow_down</span>`;
 
   collapseButton.addEventListener("click", function () {
     this.classList.toggle("active");
@@ -38,14 +38,14 @@ const colapsePreviousElement = (paletteName, text) => {
         family[i].style.maxHeight = null;
         family[i].style.border = null;
       }
-      collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">remove</span>`;
+      collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">keyboard_arrow_up</span>`;
     } else {
       collapseContent.style.maxHeight = "0";
       for (let i = 0; i < family.length; i++) {
         family[i].style.maxHeight = "0";
         family[i].style.setProperty("border", "0", "important");
       }
-      collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">add</span>`;
+      collapseButton.innerHTML = `${text} <span class="material-symbols-outlined">keyboard_arrow_down</span>`;
     }
   });
   palette.appendChild(collapseButton);

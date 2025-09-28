@@ -83,5 +83,8 @@
   },
   "changes": {
     "message": "promjene"
+  },
+  "optionsPageTitle": {
+    "message": "Podesavanja"
   }
 }

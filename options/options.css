@@ -832,3 +832,245 @@ input[type="checkbox"]:indeterminate::before {
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #e1e8ed;
+}
+
+.dark-mode .header-section,
+.dark-mode .settings-section,
+.dark-mode .actions-section,
+.dark-mode #storage-text {
+  background: #2c3e50;
+  color: #e1e8ed !important;
+}
+
+.dark-mode h1,
+.dark-mode .section-title,
+.dark-mode label {
+  color: #ecf0f1;
+}
+
+.dark-mode .subtitle,
+.dark-mode .section-description,
+.dark-mode .option-description {
+  color: #bdc3c7;
+}
+
+.dark-mode .section-title {
+  border-bottom-color: #34495e;
+}
+
+.dark-mode .option {
+  border-bottom-color: #34495e;
+}
+
+.dark-mode .option-control small,
+.dark-mode #storage-stats {
+  color: #95a5a6 !important;
+}
+
+.dark-mode select {
+  background: #34495e;
+  border-color: #4a5f7a;
+  color: #ecf0f1;
+}
+
+.dark-mode select:focus {
+  border-color: #667eea;
+}
+
+.dark-mode input[type="text"],
+.dark-mode input[type="search"] {
+  background: #34495e;
+  border-color: #4a5f7a;
+  color: #ecf0f1;
+}
+
+.dark-mode input[type="text"]:focus,
+.dark-mode input[type="search"]:focus {
+  border-color: #667eea;
+}
+
+.dark-mode input[type="text"]::placeholder,
+.dark-mode input[type="search"]::placeholder {
+  color: #7f8c8d;
+}
+
+.dark-mode .search-container i {
+  color: #7f8c8d;
+}
+
+.dark-mode .style-item {
+  background: #34495e;
+  border-color: #4a5f7a;
+}
+
+.dark-mode .style-item:hover {
+  background: #3d566e;
+  border-color: #667eea;
+}
+
+.dark-mode .style-item.selected {
+  background: #425a70;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+}
+
+.dark-mode .style-name {
+  color: #ecf0f1;
+}
+
+.dark-mode .style-url,
+.dark-mode .style-date,
+.dark-mode .style-size {
+  color: #bdc3c7;
+}
+
+.dark-mode .delete-btn:hover {
+  background: rgba(231, 76, 60, 0.8);
+}
+
+.dark-mode .no-styles-message {
+  color: #7f8c8d;
+}
+
+/* Dark Mode Modal Styles */
+.dark-mode .modal-container {
+  background: #2c3e50;
+  color: #e1e8ed;
+}
+
+.dark-mode .modal-header {
+  background-color: #34495e;
+  border-bottom-color: #4a5f7a;
+}
+
+.dark-mode .modal-header h2 {
+  color: #ecf0f1;
+}
+
+.dark-mode .close-btn {
+  color: #bdc3c7;
+}
+
+.dark-mode .close-btn:hover {
+  background-color: #4a5f7a;
+  color: #ecf0f1;
+}
+
+.dark-mode .storage-overview h3,
+.dark-mode .stored-data h3,
+.dark-mode .storage-categories h3,
+.dark-mode .style-description,
+.dark-mode .expand-btn {
+  color: #ecf0f1;
+}
+
+.dark-mode .storage-info {
+  background: #34495e;
+  border-color: #4a5f7a;
+}
+
+.dark-mode .storage-info strong {
+  color: #ecf0f1;
+}
+
+.dark-mode .usage-text span:first-child,
+.dark-mode .category-name,
+.dark-mode .category-size {
+  color: #ecf0f1;
+}
+
+.dark-mode .usage-text span:last-child,
+.dark-mode .category-description,
+.dark-mode .category-count,
+.dark-mode .deletion-summary {
+  color: #bdc3c7;
+}
+
+.dark-mode .usage-bar {
+  background-color: #4a5f7a;
+}
+
+.dark-mode .info-note {
+  background: #34495e;
+  border-color: #4a5f7a;
+  color: #87ceeb;
+}
+
+.dark-mode .search-input {
+  background: #34495e;
+  border-color: #4a5f7a;
+  color: #ecf0f1;
+}
+
+.dark-mode .search-input:focus {
+  border-color: #667eea;
+}
+
+.dark-mode .search-input::placeholder {
+  color: #7f8c8d;
+}
+
+.dark-mode .search-icon {
+  color: #7f8c8d;
+}
+
+.dark-mode .category-controls button {
+  background: #34495e;
+  border-color: #4a5f7a;
+  color: #bdc3c7;
+}
+
+.dark-mode .category-controls button:hover {
+  background: #3d566e;
+  border-color: #667eea;
+  color: #ecf0f1;
+}
+
+.dark-mode .categories-container {
+  border-color: #4a5f7a;
+}
+
+.dark-mode .category-item {
+  border-bottom-color: #4a5f7a;
+}
+
+.dark-mode .category-item:hover {
+  background-color: #34495e;
+}
+
+.dark-mode .website-item {
+  background: #34495e;
+  border-color: #4a5f7a;
+}
+
+.dark-mode .website-item:hover {
+  background: #3d566e;
+  border-color: #667eea;
+}
+
+.dark-mode .website-name {
+  color: #ecf0f1;
+}
+
+.dark-mode .website-info {
+  color: #bdc3c7;
+}
+
+.dark-mode .website-actions .delete-website-btn {
+  color: #e74c3c;
+}
+
+.dark-mode .website-actions .delete-website-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+.dark-mode .modal-footer {
+  background: #34495e;
+  border-top-color: #4a5f7a;
+}

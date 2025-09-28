@@ -58,6 +58,29 @@
     // syncAcrossDevices: document.getElementById("sync-across-devices")
   };
 
+  // Function to apply color scheme to the options page
+  function applyColorScheme(colorScheme = 'system') {
+    const body = document.body;
+    const isDarkMode = colorScheme === 'dark' || 
+      (colorScheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    if (isDarkMode) {
+      body.classList.add('dark-mode');
+    } else {
+      body.classList.remove('dark-mode');
+    }
+  }
+
+  // Listen for system theme changes when using 'system' setting
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    chrome.storage.local.get(['Colorfy_colorScheme'], (data) => {
+      const colorScheme = data.Colorfy_colorScheme || 'system';
+      if (colorScheme === 'system') {
+        applyColorScheme(colorScheme);
+      }
+    });
+  });
+
   // Load storage versioning module only if not already loaded
   if (!window.COLORFY_STORAGE_INITIALIZED) {
     const script = document.createElement('script');
@@ -112,6 +135,11 @@
   elements.importDataBtn.addEventListener("click", () => elements.importFileInput.click());
   elements.importFileInput.addEventListener("change", importData);
 
+  // Color scheme change listener for immediate dark mode application
+  elements.colorScheme.addEventListener("change", () => {
+    applyColorScheme(elements.colorScheme.value);
+  });
+
   // Migration event listeners
   elements.manualMigrationBtn.addEventListener("click", runManualMigration);
   elements.deleteBackupBtn.addEventListener("click", deleteMigrationBackup);
@@ -137,6 +165,9 @@
       elements.colorScheme.value = data.Colorfy_colorScheme || "system";
       elements.useGradients.checked = data.Colorfy_useGradients !== false ? true : false;
       elements.devMode.checked = data.Colorfy_devMode || false;
+      
+      // Apply color scheme to options page
+      applyColorScheme(elements.colorScheme.value);
       
       // TODO: Uncomment when implementing new features
       // Color picker settings

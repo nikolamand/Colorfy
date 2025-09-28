@@ -444,14 +444,25 @@ const checkAndShowStorageWarning = async (paletteWrapper) => {
       const infoDiv = document.createElement('div');
       infoDiv.className = 'storage_info__Colorfy';
       
+      // Check if dark theme is active
+      const isDark = paletteWrapper.classList.contains('Colorfy_dark-scheme');
+      
+      // Theme-aware styles
+      const backgroundColor = isDark ? '#1a2832' : '#d1ecf1';
+      const borderColor = isDark ? '#2d4a5a' : '#bee5eb';
+      const textColor = isDark ? '#87ceeb' : '#0c5460';
+      const buttonBg = isDark ? '#2d4a5a' : '#0c5460';
+      const buttonColor = isDark ? '#87ceeb' : 'white';
+      const buttonHoverBg = isDark ? '#3a5a6e' : '#094347';
+      
           infoDiv.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: #0c5460;">
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: ${backgroundColor}; border: 1px solid ${borderColor}; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: ${textColor};">
           <span style="font-size: 16px;">💾</span>
           <div style="flex: 1;">
             <strong>Storage Usage:</strong> ${formatBytes(stats.usedBytes)} stored
             <br><small>Stored locally on your device - no browser storage limits</small>
           </div>
-          <button id="storage-options-btn" style="background: #0c5460; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='#094347'" onmouseout="this.style.backgroundColor='#0c5460'">
+          <button id="storage-options-btn" style="background: ${buttonBg}; color: ${buttonColor}; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='${buttonHoverBg}'" onmouseout="this.style.backgroundColor='${buttonBg}'">
             Manage Data
           </button>
         </div>
