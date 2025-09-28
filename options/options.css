@@ -249,6 +249,42 @@ button#delete-backup-btn:disabled {
   border-radius: 4px;
 }
 
+/* Export/Import button styles */
+.export-import-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.export-import-buttons button {
+  min-width: 100px;
+}
+
+button#export-data-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+button#export-data-btn:hover {
+  background-color: #218838;
+}
+
+button#import-data-btn {
+  background-color: #17a2b8;
+  color: white;
+}
+
+button#import-data-btn:hover {
+  background-color: #138496;
+}
+
+button#export-data-btn:disabled,
+button#import-data-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .options-container {
@@ -468,6 +504,42 @@ button#delete-backup-btn:disabled {
   font-size: 14px;
   color: #004085;
   line-height: 1.4;
+}
+
+/* Search Container Styles */
+.search-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #666;
+  pointer-events: none;
 }
 
 .category-controls {

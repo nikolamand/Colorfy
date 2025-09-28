@@ -173,7 +173,7 @@ function getBaseUrlFromLegacy(url) {
 }
 
 /**
- * Get current storage usage statistics
+ * Get current storage usage statistics - Updated for unlimited storage
  */
 window.getStorageStats = () => {
   return new Promise((resolve) => {
@@ -181,22 +181,15 @@ window.getStorageStats = () => {
       const jsonString = JSON.stringify(items);
       const bytes = new Blob([jsonString]).size;
       
-      // TEMPORARY: Lower limits for testing (remove after testing)
-      const maxBytes = 5 * 1024; // 5KB limit for testing (normally 10MB)
-      const testingMode = false; // Set to false for production
-      
-      // Use normal limits in production
-      const actualMaxBytes = testingMode ? maxBytes : (10 * 1024 * 1024);
-      const actualThreshold = testingMode ? 0.6 : 0.9; // 60% for testing, 90% for production
-      
+      // With unlimitedStorage permission, there's no practical limit
       resolve({
         usedBytes: bytes,
-        maxBytes: actualMaxBytes,
-        usagePercent: (bytes / actualMaxBytes * 100).toFixed(1),
-        remainingBytes: actualMaxBytes - bytes,
-        isNearLimit: bytes > (actualMaxBytes * actualThreshold),
+        maxBytes: null, // No limit with unlimitedStorage permission
+        usagePercent: 0, // No meaningful percentage without a limit
+        remainingBytes: null, // Unlimited remaining space
+        isNearLimit: false, // Never near limit with unlimited storage
         items: Object.keys(items).length,
-        testingMode: testingMode
+        isUnlimited: true
       });
     });
   });

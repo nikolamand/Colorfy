@@ -25,6 +25,12 @@
     categoriesList: document.getElementById("categories-list"),
     selectAllBtn: document.getElementById("select-all-btn"),
     selectNoneBtn: document.getElementById("select-none-btn"),
+    websiteSearch: document.getElementById("website-search"),
+    
+    // Export/Import elements
+    exportDataBtn: document.getElementById("export-data-btn"),
+    importDataBtn: document.getElementById("import-data-btn"),
+    importFileInput: document.getElementById("import-file-input"),
     
     // Migration elements
     migrationOption: document.getElementById("migration-option"),
@@ -92,6 +98,20 @@
   elements.selectAllBtn.addEventListener("click", selectAllCategories);
   elements.selectNoneBtn.addEventListener("click", selectNoCategories);
 
+  // Search functionality
+  elements.websiteSearch.addEventListener("input", filterWebsites);
+  elements.websiteSearch.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      elements.websiteSearch.value = "";
+      filterWebsites();
+    }
+  });
+
+  // Export/Import event listeners
+  elements.exportDataBtn.addEventListener("click", exportData);
+  elements.importDataBtn.addEventListener("click", () => elements.importFileInput.click());
+  elements.importFileInput.addEventListener("change", importData);
+
   // Migration event listeners
   elements.manualMigrationBtn.addEventListener("click", runManualMigration);
   elements.deleteBackupBtn.addEventListener("click", deleteMigrationBackup);
@@ -137,32 +157,47 @@
     });
   }
 
-  // Update storage information display
+  // Update storage information display - Updated for unlimited storage
   async function updateStorageInfo() {
     if (window.getStorageStats && window.formatBytes) {
       const stats = await window.getStorageStats();
       
-      // Update progress bar
-      elements.storageBar.style.width = `${stats.usagePercent}%`;
-      
-      // Set color based on usage
-      if (stats.usagePercent > 90) {
-        elements.storageBar.style.backgroundColor = '#dc3545'; // Red
-      } else if (stats.usagePercent > 75) {
-        elements.storageBar.style.backgroundColor = '#ffc107'; // Yellow
-      } else {
-        elements.storageBar.style.backgroundColor = '#28a745'; // Green
-      }
-      
-      // Update text
-      elements.storageText.textContent = `${stats.usagePercent}% used`;
-      elements.storageStats.textContent = 
-        `${window.formatBytes(stats.usedBytes)} of ${window.formatBytes(stats.maxBytes)} used (${stats.items} items)`;
-      
-      // Show warning if near limit
-      if (stats.isNearLimit) {
+      if (stats.isUnlimited) {
+        // With unlimited storage, show usage without percentage bars
+        elements.storageBar.style.width = '100%';
+        elements.storageBar.style.backgroundColor = '#007bff'; // Blue for unlimited
+        
+        // Update text to reflect unlimited storage
+        elements.storageText.textContent = 'Unlimited Storage';
+        elements.storageStats.textContent = 
+          `${window.formatBytes(stats.usedBytes)} stored • No storage limits`;
+          
+        // Add helpful info about unlimited storage
         elements.storageStats.innerHTML += 
-          '<br><span style="color: #dc3545; font-weight: bold;">⚠️ Storage nearly full! Consider clearing old data.</span>';
+          '<br><span style="color: #007bff; font-size: 11px;">💾 Stored locally on your device - no browser storage limits</span>';
+      } else {
+        // Fallback for regular storage (shouldn't happen with unlimitedStorage permission)
+        elements.storageBar.style.width = `${stats.usagePercent}%`;
+        
+        // Set color based on usage
+        if (stats.usagePercent > 90) {
+          elements.storageBar.style.backgroundColor = '#dc3545'; // Red
+        } else if (stats.usagePercent > 75) {
+          elements.storageBar.style.backgroundColor = '#ffc107'; // Yellow
+        } else {
+          elements.storageBar.style.backgroundColor = '#28a745'; // Green
+        }
+        
+        // Update text
+        elements.storageText.textContent = `${stats.usagePercent}% used`;
+        elements.storageStats.textContent = 
+          `${window.formatBytes(stats.usedBytes)} of ${window.formatBytes(stats.maxBytes)} used`;
+        
+        // Show warning if near limit
+        if (stats.isNearLimit) {
+          elements.storageStats.innerHTML += 
+            '<br><span style="color: #dc3545; font-weight: bold;">⚠️ Storage nearly full! Consider clearing old data.</span>';
+        }
       }
     }
   }
@@ -346,28 +381,45 @@
     if (window.getStorageStats && window.formatBytes) {
       const stats = await window.getStorageStats();
       
-      // Update modal progress bar
-      elements.modalStorageFill.style.width = `${stats.usagePercent}%`;
-      
-      // Set color based on usage
-      if (stats.usagePercent > 90) {
-        elements.modalStorageFill.style.backgroundColor = '#dc3545'; // Red
-      } else if (stats.usagePercent > 75) {
-        elements.modalStorageFill.style.backgroundColor = '#ffc107'; // Yellow
+      if (stats.isUnlimited) {
+        // Update modal for unlimited storage
+        elements.modalStorageFill.style.width = '100%';
+        elements.modalStorageFill.style.backgroundColor = '#007bff'; // Blue for unlimited
+        
+        // Update modal text
+        elements.modalStorageText.textContent = 'Unlimited Storage';
+        elements.modalStorageDetails.textContent = `${window.formatBytes(stats.usedBytes)} stored`;
       } else {
-        elements.modalStorageFill.style.backgroundColor = '#28a745'; // Green
+        // Fallback for regular storage
+        elements.modalStorageFill.style.width = `${stats.usagePercent}%`;
+        
+        // Set color based on usage
+        if (stats.usagePercent > 90) {
+          elements.modalStorageFill.style.backgroundColor = '#dc3545'; // Red
+        } else if (stats.usagePercent > 75) {
+          elements.modalStorageFill.style.backgroundColor = '#ffc107'; // Yellow
+        } else {
+          elements.modalStorageFill.style.backgroundColor = '#28a745'; // Green
+        }
+        
+        // Update modal text
+        elements.modalStorageText.textContent = `${stats.usagePercent}% used`;
+        elements.modalStorageDetails.textContent = 
+          `${window.formatBytes(stats.usedBytes)} of ${window.formatBytes(stats.maxBytes)}`;
       }
-      
-      // Update modal text
-      elements.modalStorageText.textContent = `${stats.usagePercent}% used`;
-      elements.modalStorageDetails.textContent = 
-        `${window.formatBytes(stats.usedBytes)} of ${window.formatBytes(stats.maxBytes)}`;
     }
   }
 
   async function populateStorageCategories() {
     chrome.storage.local.get(null, (items) => {
       const categories = analyzeStorageData(items);
+      allWebsitesData = categories; // Store for filtering
+      
+      // Clear search when repopulating
+      if (elements.websiteSearch) {
+        elements.websiteSearch.value = "";
+      }
+      
       renderCategories(categories);
       updateDeletionSummary();
     });
@@ -495,14 +547,62 @@
     }
   }
 
+  // Website filtering functionality
+  let allWebsitesData = null; // Store the original data for filtering
+
+  function filterWebsites() {
+    if (!allWebsitesData) return;
+
+    const searchTerm = elements.websiteSearch.value.toLowerCase().trim();
+    
+    if (!searchTerm) {
+      // Show all websites when search is empty
+      renderCategories(allWebsitesData);
+      return;
+    }
+
+    // Filter websites based on search term
+    const filteredWebsites = {};
+    Object.keys(allWebsitesData.websites).forEach(domain => {
+      const website = allWebsitesData.websites[domain];
+      if (website.domain.toLowerCase().includes(searchTerm) || 
+          (website.displayName && website.displayName.toLowerCase().includes(searchTerm))) {
+        filteredWebsites[domain] = website;
+      }
+    });
+
+    // Create filtered data object
+    const filteredData = {
+      websites: filteredWebsites,
+      settingsSize: allWebsitesData.settingsSize
+    };
+
+    renderCategories(filteredData);
+  }
+
   function renderCategories(data) {
     const { websites, settingsSize } = data;
     const websiteList = Object.values(websites);
     const totalSize = websiteList.reduce((sum, site) => sum + site.totalSize, 0) + settingsSize;
+    const searchTerm = elements.websiteSearch.value.toLowerCase().trim();
+    const isFiltered = searchTerm.length > 0;
     
     elements.categoriesList.innerHTML = '';
 
-    if (websiteList.length === 0) {
+    // Show search results indicator if filtering
+    if (isFiltered) {
+      const searchResultsDiv = document.createElement('div');
+      searchResultsDiv.className = 'search-results-indicator';
+      searchResultsDiv.innerHTML = `
+        <div style="background: #e8f4fd; border: 1px solid #b8daff; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; color: #004085;">
+          📊 Showing ${websiteList.length} result${websiteList.length !== 1 ? 's' : ''} for "${searchTerm}"
+          ${websiteList.length === 0 ? '- Try a different search term' : ''}
+        </div>
+      `;
+      elements.categoriesList.appendChild(searchResultsDiv);
+    }
+
+    if (websiteList.length === 0 && !isFiltered) {
       elements.categoriesList.innerHTML = `
         <div class="category-item">
           <div class="category-info" style="justify-content: center; text-align: center; padding: 20px;">
@@ -996,6 +1096,158 @@
     } catch (error) {
       console.error('Error updating migration UI:', error);
     }
+  }
+
+  // Export/Import functionality
+  
+  /**
+   * Export all Colorfy data to a JSON file
+   */
+  async function exportData() {
+    const originalText = elements.exportDataBtn.textContent;
+    elements.exportDataBtn.textContent = "Exporting...";
+    elements.exportDataBtn.disabled = true;
+
+    try {
+      // Get all storage data
+      chrome.storage.local.get(null, (data) => {
+        // Filter out only Colorfy-related data
+        const colorfyData = {};
+        for (const [key, value] of Object.entries(data)) {
+          if (key.startsWith('Colorfy')) {
+            colorfyData[key] = value;
+          }
+        }
+
+        // Add metadata
+        const exportData = {
+          metadata: {
+            exportDate: new Date().toISOString(),
+            extensionVersion: chrome.runtime.getManifest().version,
+            dataVersion: "2.0", // Current data format version
+            totalKeys: Object.keys(colorfyData).length
+          },
+          data: colorfyData
+        };
+
+        // Create and download file
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+          type: 'application/json' 
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `colorfy-backup-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        // Show success message
+        elements.exportDataBtn.textContent = "✅ Exported!";
+        elements.exportDataBtn.style.backgroundColor = "#28a745";
+        
+        setTimeout(() => {
+          elements.exportDataBtn.textContent = originalText;
+          elements.exportDataBtn.style.backgroundColor = "";
+          elements.exportDataBtn.disabled = false;
+        }, 2000);
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      elements.exportDataBtn.textContent = "❌ Export Failed";
+      elements.exportDataBtn.style.backgroundColor = "#dc3545";
+      
+      setTimeout(() => {
+        elements.exportDataBtn.textContent = originalText;
+        elements.exportDataBtn.style.backgroundColor = "";
+        elements.exportDataBtn.disabled = false;
+      }, 3000);
+    }
+  }
+
+  /**
+   * Import Colorfy data from a JSON file
+   */
+  async function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const originalText = elements.importDataBtn.textContent;
+    elements.importDataBtn.textContent = "Importing...";
+    elements.importDataBtn.disabled = true;
+
+    try {
+      const text = await file.text();
+      const importData = JSON.parse(text);
+
+      // Validate import data structure
+      if (!importData.metadata || !importData.data) {
+        throw new Error('Invalid backup file format');
+      }
+
+      // Show confirmation dialog
+      const websiteCount = Object.keys(importData.data.Colorfy_Styles ? 
+        JSON.parse(importData.data.Colorfy_Styles) : {}).length;
+      
+      const confirmMessage = `Import data from ${importData.metadata.exportDate?.split('T')[0] || 'unknown date'}?\n\n` +
+        `• Extension Version: ${importData.metadata.extensionVersion || 'unknown'}\n` +
+        `• Data Keys: ${importData.metadata.totalKeys || 0}\n` +
+        `• Websites: ~${websiteCount}\n\n` +
+        `⚠️ This will MERGE with your current data. Existing websites with the same domain may be overwritten.\n\n` +
+        `Continue with import?`;
+
+      if (!confirm(confirmMessage)) {
+        elements.importDataBtn.textContent = originalText;
+        elements.importDataBtn.disabled = false;
+        return;
+      }
+
+      // Import the data
+      chrome.storage.local.set(importData.data, () => {
+        if (chrome.runtime.lastError) {
+          throw new Error(chrome.runtime.lastError.message);
+        }
+
+        // Show success message
+        elements.importDataBtn.textContent = "✅ Imported!";
+        elements.importDataBtn.style.backgroundColor = "#17a2b8";
+        
+        // Update storage info
+        setTimeout(() => {
+          updateStorageInfo();
+          updateMigrationUI();
+        }, 500);
+        
+        setTimeout(() => {
+          elements.importDataBtn.textContent = originalText;
+          elements.importDataBtn.style.backgroundColor = "";
+          elements.importDataBtn.disabled = false;
+        }, 2000);
+      });
+
+    } catch (error) {
+      console.error('Import error:', error);
+      
+      let errorMessage = "❌ Import Failed";
+      if (error.message.includes('Invalid backup')) {
+        errorMessage = "❌ Invalid File";
+      } else if (error.message.includes('JSON')) {
+        errorMessage = "❌ Invalid JSON";
+      }
+      
+      elements.importDataBtn.textContent = errorMessage;
+      elements.importDataBtn.style.backgroundColor = "#dc3545";
+      
+      setTimeout(() => {
+        elements.importDataBtn.textContent = originalText;
+        elements.importDataBtn.style.backgroundColor = "";
+        elements.importDataBtn.disabled = false;
+      }, 3000);
+    }
+
+    // Clear the file input
+    event.target.value = '';
   }
 
   // Initialize migration UI when page loads

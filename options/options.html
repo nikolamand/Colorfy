@@ -62,7 +62,7 @@
         <div class="option">
           <div class="option-info">
             <label for="storage-usage">Storage Usage</label>
-            <div class="option-description">Current usage of Chrome's local storage quota</div>
+            <div class="option-description">Current storage usage - unlimited storage enabled</div>
           </div>
           <div class="option-control">
             <div id="storage-info">
@@ -106,6 +106,23 @@
           </div>
           <div class="option-control">
             <button id="manage-storage-btn" type="button">Manage Storage</button>
+          </div>
+        </div>
+
+        <div class="option">
+          <div class="option-info">
+            <label for="export-import">Export / Import Data</label>
+            <div class="option-description">Backup your colors and settings to transfer between browsers</div>
+          </div>
+          <div class="option-control">
+            <div class="export-import-buttons">
+              <button id="export-data-btn" type="button">Export Data</button>
+              <button id="import-data-btn" type="button">Import Data</button>
+              <input type="file" id="import-file-input" accept=".json" style="display: none;">
+            </div>
+            <small style="display: block; margin-top: 8px; color: #666;">
+              💡 Export creates a JSON file with all your saved colors and settings
+            </small>
           </div>
         </div>
 
@@ -161,6 +178,12 @@
             <p class="info-note">
               ℹ️ Original styles (default page appearance) are not shown in expandable lists and are only removed when deleting the entire website.
             </p>
+            
+            <!-- Search Input -->
+            <div class="search-container">
+              <input type="text" id="website-search" placeholder="Search websites..." class="search-input">
+              <span class="search-icon">🔍</span>
+            </div>
             
             <div class="category-controls">
               <button id="select-all-btn" type="button">Select All</button>

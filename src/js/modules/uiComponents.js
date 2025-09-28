@@ -391,7 +391,7 @@ const setUIReferences = (refs) => {
 };
 
 /**
- * Get current storage usage statistics (copied from storageVersioning.js)
+ * Get current storage usage statistics - Updated for unlimited storage
  */
 const getStorageStats = () => {
   return new Promise((resolve) => {
@@ -399,24 +399,18 @@ const getStorageStats = () => {
       const jsonString = JSON.stringify(items);
       const bytes = new Blob([jsonString]).size;
       
-      // TEMPORARY: Lower limits for testing (remove after testing)
-      // const maxBytes = 5 * 1024; // 5KB limit for testing (normally 10MB)
-      // const testingMode = true; // Set to false for production
-      
-      // Normal production limits (commented out for testing)
-      const maxBytes = 10 * 1024 * 1024; // 10MB limit for chrome.storage.local
-      const testingMode = false;
-      
-      const usagePercent = Math.round((bytes / maxBytes) * 100);
-      const warningThreshold = testingMode ? 60 : 80; // 60% for testing, 80% for production
-      const isNearLimit = usagePercent >= warningThreshold;
+      // With unlimitedStorage permission, there's no practical limit
+      // We'll show the actual usage without percentage warnings
+      const maxBytes = null; // No limit with unlimitedStorage permission
+      const usagePercent = 0; // No meaningful percentage without a limit
+      const isNearLimit = false; // Never near limit with unlimited storage
       
       resolve({
         usedBytes: bytes,
         maxBytes: maxBytes,
         usagePercent: usagePercent,
         isNearLimit: isNearLimit,
-        testingMode: testingMode
+        isUnlimited: true
       });
     });
   });
@@ -436,35 +430,33 @@ const formatBytes = (bytes) => {
 };
 
 /**
- * Check storage usage and show warning if near limit
+ * Check storage usage - Updated for unlimited storage
+ * With unlimitedStorage permission, we don't need to show warnings
+ * but can optionally show storage usage info
  */
 const checkAndShowStorageWarning = async (paletteWrapper) => {
   try {
     const stats = await getStorageStats();
 
-    if (stats.isNearLimit) {
-      // Create warning banner
-      const warningDiv = document.createElement('div');
-      warningDiv.className = 'storage_warning__Colorfy';
+    // With unlimited storage, we don't show warnings
+    // Only show usage info if user has substantial data (>1MB) - optional
+    if (stats.usedBytes > 1024 * 1024) { // Show info if >1MB of data
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'storage_info__Colorfy';
       
-      const testingNote = stats.testingMode ? '<br><small style="color: #007bff;"><strong>🧪 TESTING MODE:</strong> Using 5KB limit at 60% threshold</small>' : '';
-      
-      warningDiv.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: #856404;">
-          <span style="font-size: 16px;">⚠️</span>
+          infoDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: #0c5460;">
+          <span style="font-size: 16px;">💾</span>
           <div style="flex: 1;">
-            <strong>Storage Warning:</strong> ${formatBytes(stats.usedBytes)} of ${formatBytes(stats.maxBytes)} used (${stats.usagePercent}%)
-            <br><small>Consider clearing old data to continue using Colorfy.</small>
-            ${testingNote}
+            <strong>Storage Usage:</strong> ${formatBytes(stats.usedBytes)} stored
+            <br><small>Stored locally on your device - no browser storage limits</small>
           </div>
-          <button id="storage-options-btn" style="background: #856404; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='#6c4f03'" onmouseout="this.style.backgroundColor='#856404'">
+          <button id="storage-options-btn" style="background: #0c5460; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='#094347'" onmouseout="this.style.backgroundColor='#0c5460'">
             Manage Data
           </button>
         </div>
-      `;
-      
-      // Add click handler for the manage storage button
-      warningDiv.querySelector('#storage-options-btn').addEventListener('click', () => {
+      `;      // Add click handler for the manage storage button
+      infoDiv.querySelector('#storage-options-btn').addEventListener('click', () => {
         // Send message to background script to open options page
         chrome.runtime.sendMessage({ type: 'openOptionsPage' });
       });
@@ -472,13 +464,13 @@ const checkAndShowStorageWarning = async (paletteWrapper) => {
       // Insert after style selector or at beginning
       const styleSelector = paletteWrapper.querySelector('.style_selector_wrapper__Colorfy');
       if (styleSelector) {
-        styleSelector.after(warningDiv);
+        styleSelector.after(infoDiv);
       } else {
         const closeBtn = paletteWrapper.querySelector('.closeColorfy__Colorfy');
         if (closeBtn) {
-          closeBtn.after(warningDiv);
+          closeBtn.after(infoDiv);
         } else {
-          paletteWrapper.appendChild(warningDiv);
+          paletteWrapper.appendChild(infoDiv);
         }
       }
     }

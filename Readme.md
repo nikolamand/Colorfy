@@ -93,4 +93,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-<sub><sup>*Chrome Web Store listing coming soon! 🚀*</sup></sub>
+<sub><sup>*Available on the [Chrome Web Store](https://chromewebstore.google.com/detail/colorfy/nbdflkflpbgpfmnchfpjmobfgaahnbec)! 🚀*</sup></sub>
+
+
+
+## 🔒 Permissions
+
+### Storage Permission
+This extension requires `unlimitedStorage` permission to accommodate users who extensively customize colors across many websites. With the new multi-style functionality allowing multiple color schemes per website, storage needs can grow significantly for power users. This permission ensures the extension can store unlimited color customizations without hitting Chrome's storage quotas, providing a seamless experience regardless of how many websites and styles users create.
