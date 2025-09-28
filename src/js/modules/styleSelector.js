@@ -44,7 +44,7 @@ const createStyleSelector = (paletteWrapper) => {
   const helpMessage = document.createElement("div");
   helpMessage.className = "style_help_message__Colorfy";
   helpMessage.id = "colorfy_style_help";
-  helpMessage.innerHTML = chrome.i18n.getMessage("helpMessage");
+  helpMessage.innerHTML = `<span class="material-symbols-outlined icon-lightbulb" style="font-size: 16px; margin-right: 4px;">lightbulb</span>${chrome.i18n.getMessage("helpMessage")}`;
   helpMessage.style.display = "none"; // Initially hidden
   
   styleSelectorWrapper.appendChild(helpMessage);
@@ -138,7 +138,7 @@ const updateHelpMessage = (styleId) => {
   }
   
   if (currentStyleId === "original") {
-    helpElement.innerHTML = chrome.i18n.getMessage("helpMessage");
+    helpElement.innerHTML = `<span class="material-symbols-outlined icon-lightbulb" style="font-size: 16px; margin-right: 4px;">lightbulb</span>${chrome.i18n.getMessage("helpMessage")}`;
     helpElement.style.display = "flex";
   } else {
     // Hide the message for editable styles
@@ -178,7 +178,7 @@ const openStyleEditModal = () => {
   // Close button
   const closeBtn = document.createElement("span");
   closeBtn.className = "style_edit_close__Colorfy";
-  closeBtn.innerHTML = "&times;";
+  closeBtn.innerHTML = `<span class="material-symbols-outlined">close</span>`;
   closeBtn.onclick = closeStyleEditModal;
   
   // Title
@@ -258,7 +258,7 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
     // Delete button (only for non-original styles)
     if (!style.isOriginal) {
       const deleteBtn = document.createElement("button");
-      deleteBtn.innerHTML = "×";
+      deleteBtn.innerHTML = `<span class="material-symbols-outlined">delete</span>`;
       deleteBtn.className = "style_delete_btn__Colorfy";
       deleteBtn.title = chrome.i18n.getMessage("deleteStyle");
       deleteBtn.onclick = () => handleStyleDelete(style.id);
@@ -266,7 +266,7 @@ const populateStyleEditModal = (stylesList, addNewSection) => {
       
       // Clone button
       const cloneBtn = document.createElement("button");
-      cloneBtn.innerHTML = "📋";
+      cloneBtn.innerHTML = `<span class="material-symbols-outlined">content_copy</span>`;
       cloneBtn.className = "style_clone_btn__Colorfy";
       cloneBtn.title = chrome.i18n.getMessage("cloneStyle");
       cloneBtn.onclick = () => handleStyleClone(style);

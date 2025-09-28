@@ -23,14 +23,14 @@ const loadDevMode = () => {
 const setDevMode = (enabled) => {
   devMode = enabled;
   chrome.storage.local.set({ Colorfy_devMode: enabled });
-  
+
   // Update UI immediately if button exists
   const savedItemsButton = document.getElementById("saved_items_button");
   if (savedItemsButton) {
     if (enabled) {
-      savedItemsButton.style.setProperty('display', 'flex', 'important');
+      savedItemsButton.style.setProperty("display", "flex", "important");
     } else {
-      savedItemsButton.style.setProperty('display', 'none', 'important');
+      savedItemsButton.style.setProperty("display", "none", "important");
     }
   }
 };
@@ -45,7 +45,7 @@ const getDevMode = () => devMode;
  */
 const createPaletteWrapper = (callback) => {
   getPreviouslySavedColors();
-  
+
   // Load dev mode setting and create UI after it's loaded
   chrome.storage.local.get("Colorfy_devMode", (data) => {
     devMode = data.Colorfy_devMode || false; // Default to false
@@ -59,15 +59,21 @@ const createPaletteWrapper = (callback) => {
 const createPaletteWrapperInternal = (callback) => {
   // Initialize styles first, then ensure styles exist - with retry logic for loading order
   const initializeStylesWithRetry = (retryCount = 0) => {
-    if (window.initializeStyles && typeof window.initializeStyles === 'function') {
+    if (
+      window.initializeStyles &&
+      typeof window.initializeStyles === "function"
+    ) {
       window.initializeStyles(() => {
         // Now ensure styles exist (lazy creation)
-        if (window.ensureStylesExist && typeof window.ensureStylesExist === 'function') {
+        if (
+          window.ensureStylesExist &&
+          typeof window.ensureStylesExist === "function"
+        ) {
           window.ensureStylesExist(() => {
             createPaletteElements(callback);
           });
         } else {
-          console.error('ensureStylesExist function not available');
+          console.error("ensureStylesExist function not available");
           createPaletteElements(callback);
         }
       });
@@ -75,11 +81,13 @@ const createPaletteWrapperInternal = (callback) => {
       // Retry after a short delay if not loaded yet
       setTimeout(() => initializeStylesWithRetry(retryCount + 1), 100);
     } else {
-      console.error('initializeStyles function not available after retries, proceeding without style initialization');
+      console.error(
+        "initializeStyles function not available after retries, proceeding without style initialization"
+      );
       createPaletteElements(callback);
     }
   };
-  
+
   initializeStylesWithRetry();
 };
 
@@ -103,7 +111,7 @@ const createPaletteElements = (callback) => {
   // Close button
   const closeBtn = document.createElement("span");
   closeBtn.className = "closeColorfy__Colorfy";
-  closeBtn.innerHTML = "&times;";
+  closeBtn.innerHTML = `<span class="material-symbols-outlined">close</span>`;
   closeBtn.title = chrome.i18n.getMessage("closeButton");
   closeBtn.onclick = closeColorfy;
   paletteWrapper.appendChild(closeBtn);
@@ -115,7 +123,7 @@ const createPaletteElements = (callback) => {
 
   // Add storage warning if needed
   checkAndShowStorageWarning(paletteWrapper).catch((error) => {
-    console.error('❌ checkAndShowStorageWarning failed:', error);
+    console.error("❌ checkAndShowStorageWarning failed:", error);
   });
 
   // Container for background/text color pickers
@@ -140,23 +148,23 @@ const createPaletteElements = (callback) => {
   savedItemsButton.title = chrome.i18n.getMessage("advancedChanges");
   // Use the loaded devMode value and use !important to override CSS
   if (devMode) {
-    savedItemsButton.style.setProperty('display', 'flex', 'important');
+    savedItemsButton.style.setProperty("display", "flex", "important");
   } else {
-    savedItemsButton.style.setProperty('display', 'none', 'important');
+    savedItemsButton.style.setProperty("display", "none", "important");
   }
   paletteWrapper.appendChild(savedItemsButton);
 
   applyColorSchemeOption();
   // Build advanced changes UI
   addSavedItems();
-  
+
   // Update editing state based on current style
   if (window.updateEditingState) {
     window.updateEditingState();
   }
-  
+
   // Call callback after all UI is created
-  if (callback && typeof callback === 'function') {
+  if (callback && typeof callback === "function") {
     callback();
   }
 };
@@ -322,8 +330,7 @@ const addSavedItems = () => {
       rect.left >= 0 &&
       rect.bottom <=
         (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <=
-        (window.innerWidth || document.documentElement.clientWidth);
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth);
 
     if (fullyInViewport) {
       optionsWrapper.style.setProperty("position", "initial", "important");
@@ -378,7 +385,7 @@ const closeColorfy = () => {
 const getUIReferences = () => ({
   modalWrapper,
   paletteWrapper,
-  colorsWrapper
+  colorsWrapper,
 });
 
 /**
@@ -398,19 +405,19 @@ const getStorageStats = () => {
     chrome.storage.local.get(null, (items) => {
       const jsonString = JSON.stringify(items);
       const bytes = new Blob([jsonString]).size;
-      
+
       // With unlimitedStorage permission, there's no practical limit
       // We'll show the actual usage without percentage warnings
       const maxBytes = null; // No limit with unlimitedStorage permission
       const usagePercent = 0; // No meaningful percentage without a limit
       const isNearLimit = false; // Never near limit with unlimited storage
-      
+
       resolve({
         usedBytes: bytes,
         maxBytes: maxBytes,
         usagePercent: usagePercent,
         isNearLimit: isNearLimit,
-        isUnlimited: true
+        isUnlimited: true,
       });
     });
   });
@@ -420,13 +427,13 @@ const getStorageStats = () => {
  * Format bytes to human readable format (copied from storageVersioning.js)
  */
 const formatBytes = (bytes) => {
-  if (bytes === 0) return '0 Bytes';
-  
+  if (bytes === 0) return "0 Bytes";
+
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
 /**
@@ -440,44 +447,51 @@ const checkAndShowStorageWarning = async (paletteWrapper) => {
 
     // With unlimited storage, we don't show warnings
     // Only show usage info if user has substantial data (>1MB) - optional
-    if (stats.usedBytes > 1024 * 1024) { // Show info if >1MB of data
-      const infoDiv = document.createElement('div');
-      infoDiv.className = 'storage_info__Colorfy';
-      
+    if (stats.usedBytes > 1024 * 1024) {
+      // Show info if >1MB of data
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "storage_info__Colorfy";
+
       // Check if dark theme is active
-      const isDark = paletteWrapper.classList.contains('Colorfy_dark-scheme');
-      
+      const isDark = paletteWrapper.classList.contains("Colorfy_dark-scheme");
+
       // Theme-aware styles
-      const backgroundColor = isDark ? '#1a2832' : '#d1ecf1';
-      const borderColor = isDark ? '#2d4a5a' : '#bee5eb';
-      const textColor = isDark ? '#87ceeb' : '#0c5460';
-      const buttonBg = isDark ? '#2d4a5a' : '#0c5460';
-      const buttonColor = isDark ? '#87ceeb' : 'white';
-      const buttonHoverBg = isDark ? '#3a5a6e' : '#094347';
-      
-          infoDiv.innerHTML = `
+      const backgroundColor = isDark ? "#1a2832" : "#d1ecf1";
+      const borderColor = isDark ? "#2d4a5a" : "#bee5eb";
+      const textColor = isDark ? "#87ceeb" : "#0c5460";
+      const buttonBg = isDark ? "#2d4a5a" : "#0c5460";
+      const buttonColor = isDark ? "#87ceeb" : "white";
+      const buttonHoverBg = isDark ? "#3a5a6e" : "#094347";
+
+      infoDiv.innerHTML = `
         <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background-color: ${backgroundColor}; border: 1px solid ${borderColor}; border-radius: 4px; margin-bottom: 10px; font-size: 12px; color: ${textColor};">
-          <span style="font-size: 16px;">💾</span>
+          <span class="material-symbols-outlined" style="font-size: 16px;">storage</span>
           <div style="flex: 1;">
-            <strong>Storage Usage:</strong> ${formatBytes(stats.usedBytes)} stored
+            <strong>Storage Usage:</strong> ${formatBytes(
+              stats.usedBytes
+            )} stored
             <br><small>Stored locally on your device - no browser storage limits</small>
           </div>
           <button id="storage-options-btn" style="background: ${buttonBg}; color: ${buttonColor}; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; white-space: nowrap; margin-left: 8px; transition: background-color 0.2s;" title="Open storage management" onmouseover="this.style.backgroundColor='${buttonHoverBg}'" onmouseout="this.style.backgroundColor='${buttonBg}'">
             Manage Data
           </button>
         </div>
-      `;      // Add click handler for the manage storage button
-      infoDiv.querySelector('#storage-options-btn').addEventListener('click', () => {
-        // Send message to background script to open options page
-        chrome.runtime.sendMessage({ type: 'openOptionsPage' });
-      });
-      
+      `; // Add click handler for the manage storage button
+      infoDiv
+        .querySelector("#storage-options-btn")
+        .addEventListener("click", () => {
+          // Send message to background script to open options page
+          chrome.runtime.sendMessage({ type: "openOptionsPage" });
+        });
+
       // Insert after style selector or at beginning
-      const styleSelector = paletteWrapper.querySelector('.style_selector_wrapper__Colorfy');
+      const styleSelector = paletteWrapper.querySelector(
+        ".style_selector_wrapper__Colorfy"
+      );
       if (styleSelector) {
         styleSelector.after(infoDiv);
       } else {
-        const closeBtn = paletteWrapper.querySelector('.closeColorfy__Colorfy');
+        const closeBtn = paletteWrapper.querySelector(".closeColorfy__Colorfy");
         if (closeBtn) {
           closeBtn.after(infoDiv);
         } else {
@@ -486,7 +500,7 @@ const checkAndShowStorageWarning = async (paletteWrapper) => {
       }
     }
   } catch (error) {
-    console.error('❌ Error checking storage stats:', error);
+    console.error("❌ Error checking storage stats:", error);
   }
 };
 
@@ -506,5 +520,5 @@ window.Colorfy = window.Colorfy || {};
 window.Colorfy.devMode = {
   enable: () => setDevMode(true),
   disable: () => setDevMode(false),
-  status: getDevMode
+  status: getDevMode,
 };

@@ -58,6 +58,71 @@
     // syncAcrossDevices: document.getElementById("sync-across-devices")
   };
 
+  /**
+   * Message template utilities
+   */
+  const MessageTemplates = {
+    /**
+     * Get a cloned message template element
+     * @param {string} templateId - ID of the template (without 'msg-' prefix)
+     * @returns {Element} Cloned template element
+     */
+    get(templateId) {
+      const template = document.getElementById(`msg-${templateId}`);
+      if (!template) {
+        console.warn(`Message template not found: msg-${templateId}`);
+        return document.createElement('span');
+      }
+      return template.cloneNode(true);
+    },
+
+    /**
+     * Get the HTML content of a message template
+     * @param {string} templateId - ID of the template (without 'msg-' prefix)
+     * @param {Object} variables - Variables to replace in template
+     * @returns {string} HTML content
+     */
+    getHTML(templateId, variables = {}) {
+      const template = this.get(templateId);
+      let html = template.innerHTML;
+      
+      // Replace variables in template
+      Object.entries(variables).forEach(([key, value]) => {
+        html = html.replace(new RegExp(`{${key}}`, 'g'), value);
+      });
+      
+      return html;
+    },
+
+    /**
+     * Get the text content of a message template
+     * @param {string} templateId - ID of the template (without 'msg-' prefix)
+     * @param {Object} variables - Variables to replace in template
+     * @returns {string} Text content
+     */
+    getText(templateId, variables = {}) {
+      const template = this.get(templateId);
+      let text = template.textContent;
+      
+      // Replace variables in template
+      Object.entries(variables).forEach(([key, value]) => {
+        text = text.replace(new RegExp(`{${key}}`, 'g'), value);
+      });
+      
+      return text;
+    },
+
+    /**
+     * Set element content using a message template
+     * @param {Element} element - Target element
+     * @param {string} templateId - ID of the template (without 'msg-' prefix)
+     * @param {Object} variables - Variables to replace in template
+     */
+    setContent(element, templateId, variables = {}) {
+      element.innerHTML = this.getHTML(templateId, variables);
+    }
+  };
+
   // Function to apply color scheme to the options page
   function applyColorScheme(colorScheme = 'system') {
     const body = document.body;
@@ -199,13 +264,14 @@
         elements.storageBar.style.backgroundColor = '#007bff'; // Blue for unlimited
         
         // Update text to reflect unlimited storage
-        elements.storageText.textContent = 'Unlimited Storage';
+        MessageTemplates.setContent(elements.storageText, 'unlimited-storage');
         elements.storageStats.textContent = 
           `${window.formatBytes(stats.usedBytes)} stored • No storage limits`;
           
         // Add helpful info about unlimited storage
         elements.storageStats.innerHTML += 
-          '<br><span style="color: #007bff; font-size: 11px;">💾 Stored locally on your device - no browser storage limits</span>';
+          '<br><span class="message-template">' + 
+          MessageTemplates.getHTML('storage-info') + '</span>';
       } else {
         // Fallback for regular storage (shouldn't happen with unlimitedStorage permission)
         elements.storageBar.style.width = `${stats.usagePercent}%`;
@@ -227,7 +293,7 @@
         // Show warning if near limit
         if (stats.isNearLimit) {
           elements.storageStats.innerHTML += 
-            '<br><span style="color: #dc3545; font-weight: bold;">⚠️ Storage nearly full! Consider clearing old data.</span>';
+            '<br><span style="color: #dc3545; font-weight: bold;"><span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">warning</span>Storage nearly full! Consider clearing old data.</span>';
         }
       }
     }
@@ -286,7 +352,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         animation: slideIn 0.3s ease-out;
       `;
-      notification.textContent = '✓ Settings saved successfully!';
+      MessageTemplates.setContent(notification, 'settings-saved');
       
       // Add animation keyframes
       if (!document.getElementById('notification-styles')) {
@@ -361,7 +427,7 @@
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
           animation: slideIn 0.3s ease-out;
         `;
-        notification.textContent = '🔄 Settings reset to defaults!';
+        MessageTemplates.setContent(notification, 'settings-reset');
         document.body.appendChild(notification);
         
         setTimeout(() => {
@@ -418,7 +484,7 @@
         elements.modalStorageFill.style.backgroundColor = '#007bff'; // Blue for unlimited
         
         // Update modal text
-        elements.modalStorageText.textContent = 'Unlimited Storage';
+        MessageTemplates.setContent(elements.modalStorageText, 'unlimited-storage');
         elements.modalStorageDetails.textContent = `${window.formatBytes(stats.usedBytes)} stored`;
       } else {
         // Fallback for regular storage
@@ -666,7 +732,7 @@
         <div class="website-header">
           <input type="checkbox" class="category-checkbox website-checkbox" data-domain="${website.domain}">
           ${hasMultipleStyles ? 
-            `<button class="expand-btn" data-expanded="false">▶</button>` : 
+            `<button class="expand-btn" data-expanded="false"><span class="material-symbols-outlined">expand_more</span></button>` : 
             '<div class="expand-placeholder"></div>'
           }
           <div class="category-info">
@@ -709,7 +775,7 @@
           
           if (!isExpanded) {
             // Expand and populate styles
-            expandBtn.textContent = '▼';
+            expandBtn.innerHTML = '<span class="material-symbols-outlined">expand_less</span>';
             expandBtn.dataset.expanded = 'true';
             stylesList.style.display = 'block';
             
@@ -719,7 +785,7 @@
             }
           } else {
             // Collapse
-            expandBtn.textContent = '▶';
+            expandBtn.innerHTML = '<span class="material-symbols-outlined">expand_more</span>';
             expandBtn.dataset.expanded = 'false';
             stylesList.style.display = 'none';
           }
@@ -1135,8 +1201,8 @@
    * Export all Colorfy data to a JSON file
    */
   async function exportData() {
-    const originalText = elements.exportDataBtn.textContent;
-    elements.exportDataBtn.textContent = "Exporting...";
+    const originalText = elements.exportDataBtn.innerHTML;
+    MessageTemplates.setContent(elements.exportDataBtn, 'exporting');
     elements.exportDataBtn.disabled = true;
 
     try {
@@ -1175,22 +1241,22 @@
         URL.revokeObjectURL(url);
 
         // Show success message
-        elements.exportDataBtn.textContent = "✅ Exported!";
+        MessageTemplates.setContent(elements.exportDataBtn, 'export-success');
         elements.exportDataBtn.style.backgroundColor = "#28a745";
         
         setTimeout(() => {
-          elements.exportDataBtn.textContent = originalText;
+          elements.exportDataBtn.innerHTML = originalText;
           elements.exportDataBtn.style.backgroundColor = "";
           elements.exportDataBtn.disabled = false;
         }, 2000);
       });
     } catch (error) {
       console.error('Export error:', error);
-      elements.exportDataBtn.textContent = "❌ Export Failed";
+      MessageTemplates.setContent(elements.exportDataBtn, 'export-failed');
       elements.exportDataBtn.style.backgroundColor = "#dc3545";
       
       setTimeout(() => {
-        elements.exportDataBtn.textContent = originalText;
+        elements.exportDataBtn.innerHTML = originalText;
         elements.exportDataBtn.style.backgroundColor = "";
         elements.exportDataBtn.disabled = false;
       }, 3000);
@@ -1225,7 +1291,7 @@
         `• Extension Version: ${importData.metadata.extensionVersion || 'unknown'}\n` +
         `• Data Keys: ${importData.metadata.totalKeys || 0}\n` +
         `• Websites: ~${websiteCount}\n\n` +
-        `⚠️ This will MERGE with your current data. Existing websites with the same domain may be overwritten.\n\n` +
+        `⚠ This will MERGE with your current data. Existing websites with the same domain may be overwritten.\n\n` +
         `Continue with import?`;
 
       if (!confirm(confirmMessage)) {

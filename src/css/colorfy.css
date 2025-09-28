@@ -48,7 +48,6 @@ body {
 /* X BUTTON */
 .closeColorfy__Colorfy {
   cursor: pointer !important;
-  font-family: Arial !important;
   line-height: initial !important;
   color: #aaa !important;
   width: 2em !important;
@@ -56,7 +55,13 @@ body {
   margin-top: 5px !important;
   text-align: center !important;
   font-size: 40px !important;
-  font-weight: bold !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.closeColorfy__Colorfy .material-symbols-outlined {
+  font-size: 40px !important;
 }
 
 /* INDIVIDUAL PALETTES */
@@ -607,10 +612,16 @@ body {
   top: 15px !important;
   right: 20px !important;
   font-size: 30px !important;
-  font-weight: bold !important;
   cursor: pointer !important;
   color: #aaa !important;
   line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.style_edit_close__Colorfy .material-symbols-outlined {
+  font-size: 30px !important;
 }
 
 .style_edit_close__Colorfy:hover {
@@ -685,13 +696,15 @@ body {
   border-radius: 3px !important;
   width: 25px !important;
   height: 25px !important;
-  font-size: 16px !important;
-  font-weight: bold !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: background-color 0.3s ease !important;
+}
+
+.style_delete_btn__Colorfy .material-symbols-outlined {
+  font-size: 16px !important;
 }
 
 .style_delete_btn__Colorfy:hover {
@@ -705,13 +718,16 @@ body {
   border-radius: 3px !important;
   width: 25px !important;
   height: 25px !important;
-  font-size: 12px !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   transition: background-color 0.3s ease !important;
   margin-left: 5px !important;
+}
+
+.style_clone_btn__Colorfy .material-symbols-outlined {
+  font-size: 16px !important;
 }
 
 .style_clone_btn__Colorfy:hover {

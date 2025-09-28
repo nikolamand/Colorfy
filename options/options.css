@@ -899,7 +899,7 @@ body.dark-mode {
   color: #7f8c8d;
 }
 
-.dark-mode .search-container i {
+.dark-mode .search-icon {
   color: #7f8c8d;
 }
 
@@ -966,6 +966,11 @@ body.dark-mode {
 .dark-mode .storage-categories h3,
 .dark-mode .style-description,
 .dark-mode .expand-btn {
+  color: #bdc3c7;
+}
+
+.dark-mode .expand-btn:hover {
+  background-color: #4a5f7a;
   color: #ecf0f1;
 }
 
@@ -1068,6 +1073,74 @@ body.dark-mode {
 .dark-mode .website-actions .delete-website-btn:hover {
   background: rgba(231, 76, 60, 0.1);
   color: #c0392b;
+}
+
+/* Message Templates Styles */
+.message-template {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message-template .icon {
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.message-template.success .icon {
+  color: #28a745;
+}
+
+.message-template.error .icon {
+  color: #dc3545;
+}
+
+.message-template.info .icon {
+  color: #007bff;
+}
+
+.message-template.warning .icon {
+  color: #ffc107;
+}
+
+.message-template .content {
+  display: flex;
+  flex-direction: column;
+}
+
+.message-template .content .name {
+  font-weight: 500;
+}
+
+.message-template .content .description {
+  font-size: 12px;
+  color: #666;
+}
+
+.dark-mode .message-template .content .description {
+  color: #bdc3c7;
+}
+
+/* Material Icon colors for better visibility */
+.icon-lightbulb {
+  color: #ffc107 !important;
+}
+
+.dark-mode .icon-lightbulb {
+  color: #ffd54f !important;
+}
+
+.icon-warning {
+  color: #ff9800 !important;
+}
+
+.dark-mode .icon-warning {
+  color: #ffb74d !important;
+}
+
+/* Inherit color for small text icons */
+small .material-symbols-outlined {
+  color: inherit;
 }
 
 .dark-mode .modal-footer {

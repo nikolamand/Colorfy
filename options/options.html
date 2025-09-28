@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>Colorfy Options</title>
     <link rel="stylesheet" type="text/css" href="./options.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="options-container">
@@ -70,7 +74,7 @@
                 <div id="storage-bar">
                   <div id="storage-fill"></div>
                 </div>
-                <span id="storage-text">Loading...</span>
+                <span id="storage-text" class="message-template">Loading...</span>
               </div>
               <div id="storage-details">
                 <small id="storage-stats">Calculating storage usage...</small>
@@ -121,7 +125,7 @@
               <input type="file" id="import-file-input" accept=".json" style="display: none;">
             </div>
             <small style="display: block; margin-top: 8px; color: #666;">
-              💡 Export creates a JSON file with all your saved colors and settings
+              <span class="material-symbols-outlined icon-lightbulb" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">lightbulb</span>Export creates a JSON file with all your saved colors and settings
             </small>
           </div>
         </div>
@@ -133,7 +137,7 @@
           </div>
           <div class="option-control">
             <button id="clear_all_changes">Clear All Data</button>
-            <small>⚠️ This cannot be undone</small>
+            <small><span class="material-symbols-outlined icon-warning" style="font-size: 16px; vertical-align: middle; margin-right: 4px;">warning</span>This cannot be undone</small>
           </div>
         </div>
       </div>
@@ -166,8 +170,8 @@
                 <div id="modal-storage-fill" class="usage-fill"></div>
               </div>
               <div class="usage-text">
-                <span id="modal-storage-text">Loading...</span>
-                <span id="modal-storage-details">Calculating usage...</span>
+                <span id="modal-storage-text" class="message-template">Loading...</span>
+                <span id="modal-storage-details" class="message-template">Calculating usage...</span>
               </div>
             </div>
           </div>
@@ -176,13 +180,14 @@
           <div class="storage-categories">
             <h3>Saved Colors by Website</h3>
             <p class="info-note">
-              ℹ️ Original styles (default page appearance) are not shown in expandable lists and are only removed when deleting the entire website.
+              <span class="material-symbols-outlined icon" style="font-size:16px; vertical-align:middle; margin-right:6px;">info</span>
+              Original styles (default page appearance) are not shown in expandable lists and are only removed when deleting the entire website.
             </p>
             
             <!-- Search Input -->
             <div class="search-container">
               <input type="text" id="website-search" placeholder="Search websites..." class="search-input">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon material-symbols-outlined">search</span>
             </div>
             
             <div class="category-controls">
@@ -202,6 +207,128 @@
             <button id="storage-modal-apply" class="danger-btn" type="button" disabled>Delete Selected</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Message Templates (Hidden) -->
+    <div id="message-templates" style="display: none;">
+      <!-- Storage Messages -->
+      <div id="msg-unlimited-storage" class="message-template">
+        <span class="material-symbols-outlined icon">storage</span>
+        <span class="text">Unlimited Storage</span>
+      </div>
+      
+      <div id="msg-storage-info" class="message-template">
+        <span class="material-symbols-outlined icon">storage</span>
+        <span class="text">Stored locally on your device - no browser storage limits</span>
+      </div>
+      
+      <div id="msg-storage-warning" class="message-template">
+        <span class="material-symbols-outlined icon icon-warning">warning</span>
+        <span class="text">Storage nearly full! Consider clearing old data.</span>
+      </div>
+
+      <!-- Notification Messages -->
+      <div id="msg-settings-saved" class="message-template success">
+        <span class="material-symbols-outlined icon">check_circle</span>
+        <span class="text">Settings saved successfully!</span>
+      </div>
+      
+      <div id="msg-settings-reset" class="message-template info">
+        <span class="material-symbols-outlined icon">refresh</span>
+        <span class="text">Settings reset to defaults!</span>
+      </div>
+
+      <!-- Export/Import Messages -->
+      <div id="msg-exporting" class="message-template">
+        <span class="material-symbols-outlined icon">download</span>
+        <span class="text">Exporting...</span>
+      </div>
+      
+      <div id="msg-export-success" class="message-template success">
+        <span class="material-symbols-outlined icon">check_circle</span>
+        <span class="text">Exported!</span>
+      </div>
+      
+      <div id="msg-export-failed" class="message-template error">
+        <span class="material-symbols-outlined icon">error</span>
+        <span class="text">Export Failed</span>
+      </div>
+      
+      <div id="msg-importing" class="message-template">
+        <span class="material-symbols-outlined icon">upload</span>
+        <span class="text">Importing...</span>
+      </div>
+      
+      <div id="msg-import-success" class="message-template success">
+        <span class="material-symbols-outlined icon">check_circle</span>
+        <span class="text">Imported!</span>
+      </div>
+      
+      <div id="msg-import-failed" class="message-template error">
+        <span class="material-symbols-outlined icon">error</span>
+        <span class="text">Import Failed</span>
+      </div>
+      
+      <div id="msg-invalid-file" class="message-template error">
+        <span class="material-symbols-outlined icon">error</span>
+        <span class="text">Invalid File</span>
+      </div>
+      
+      <div id="msg-invalid-json" class="message-template error">
+        <span class="material-symbols-outlined icon">error</span>
+        <span class="text">Invalid JSON</span>
+      </div>
+
+      <!-- Migration Messages -->
+      <div id="msg-running-migration" class="message-template">
+        <span class="material-symbols-outlined icon">sync</span>
+        <span class="text">Running Migration...</span>
+      </div>
+      
+      <div id="msg-run-migration" class="message-template">
+        <span class="text">Run Migration</span>
+      </div>
+      
+      <div id="msg-deleting" class="message-template">
+        <span class="material-symbols-outlined icon">delete</span>
+        <span class="text">Deleting...</span>
+      </div>
+      
+      <div id="msg-delete-backup" class="message-template">
+        <span class="text">Delete Backup</span>
+      </div>
+      
+      <div id="msg-migration-completed" class="message-template success">
+        <span class="text">Migration completed. You can manage the backup below.</span>
+      </div>
+
+      <!-- Search Results -->
+      <div id="msg-search-results" class="message-template info">
+        <span class="material-symbols-outlined icon">bar_chart</span>
+        <span class="text-template">Showing {count} result{plural} for "{term}"{empty}</span>
+      </div>
+      
+      <div id="msg-no-results" class="message-template">
+        <span class="text">- Try a different search term</span>
+      </div>
+
+      <!-- Settings Category -->
+      <div id="msg-settings-category" class="message-template">
+        <span class="material-symbols-outlined icon">settings</span>
+        <div class="content">
+          <div class="name">Extension Settings & System Data</div>
+          <div class="description">Cannot be deleted individually (use "Clear All Data" to reset)</div>
+        </div>
+      </div>
+
+      <!-- Expand Buttons -->
+      <div id="msg-expand-more" class="message-template">
+        <span class="material-symbols-outlined icon">expand_more</span>
+      </div>
+      
+      <div id="msg-expand-less" class="message-template">
+        <span class="material-symbols-outlined icon">expand_less</span>
       </div>
     </div>
 
